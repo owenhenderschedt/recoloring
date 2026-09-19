@@ -16,6 +16,7 @@
       }
     };
   </script>
+
   <script
     src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
     async>
@@ -27,23 +28,98 @@
 <h1>Recolorability of \((2K_2,K_4)\)-Free Graphs</h1>
 
 <p>
-This page contains the computer-assisted verification accompanying the
-paper <em>Recolorability of \((2K_2,K_4)\)-Free Graphs</em>.
-</p>
-
-<h2>Verification</h2>
-
-<p>
-The program verifies the finite attachment-profile calculations used in
-the proof. In particular, it checks the admissible profiles, possible
-rescuers, elimination rounds, and the specified \(B_{10}\) and
-\(B_{11}\) obstruction certificates.
+This page accompanies our work on the recolorability of
+\((2K_2,K_4)\)-free graphs.
 </p>
 
 <p>
-The verification code and instructions for reproducing the computation
-will be posted here.
+The project consists of two papers by Henry Echeverría and
+Owen Henderschedt. The first establishes several structural cases,
+while the second completes the problem by proving that every
+\((2K_2,K_4)\)-free graph is recolorable.
+</p>
+
+
+<h2>Papers</h2>
+
+<p>
+<strong>On the recolorability of \((2K_2,K_4)\)-free graphs.</strong><br>
+Henry Echeverría and Owen Henderschedt.<br>
+This paper proves, among other results, recolorability in the
+\(C_5\)-free case and in the \(H_4\)-free case when the graph contains
+an induced \(W_5\).<br>
+<a
+  href="https://arxiv.org/abs/2607.07860"
+  target="_blank"
+  rel="noopener noreferrer">
+  arXiv:2607.07860
+</a>
+</p>
+
+<p>
+<strong>Yes, \((2K_2,K_4)\)-free graphs are recolorable.</strong><br>
+Henry Echeverría and Owen Henderschedt.<br>
+This paper proves that every \((2K_2,K_4)\)-free graph is recolorable.<br>
+<em>arXiv link forthcoming.</em>
+</p>
+
+
+<h2>Computer-assisted verification</h2>
+
+<p>
+The proof of the second paper reduces a collection of repetitive
+finite structural calculations to attachment profiles relative to
+small induced cores. The verification program checks these finite
+calculations exhaustively.
+</p>
+
+<p>
+In particular, the verifier checks the admissible attachment profiles,
+local neighborhood comparisons, complete lists of possible rescuers,
+elimination rounds, surviving profiles, and the specified induced
+copies of the obstruction graphs \(B_{10}\) and \(B_{11}\).
+</p>
+
+<p>
+The verification is written in Python 3 and requires no external
+packages. It is run automatically through GitHub Actions on every
+update to the repository.
+</p>
+
+
+<h2>Verification code</h2>
+
+<p>
+The source code, certificate data, expected output, and instructions
+for reproducing the computation are available in the
+<a
+  href="https://github.com/owenhenderschedt/recoloring"
+  target="_blank"
+  rel="noopener noreferrer">
+  GitHub repository
+</a>.
+</p>
+
+<p>
+The main files are:
+</p>
+
+<ul>
+  <li><code>verify.py</code> — general verification logic;</li>
+  <li><code>certificates.py</code> — finite certificate data;</li>
+  <li><code>expected_output.txt</code> — output of a successful verification run.</li>
+</ul>
+
+
+<h2>Scope of the computation</h2>
+
+<p>
+The computer verification is used only for the exhaustive finite
+bookkeeping in the proof. The structural lemmas, the reduction to the
+finite attachment problems, and the recoloring arguments are proved
+mathematically in the papers.
 </p>
 
 </body>
+
 </html>
