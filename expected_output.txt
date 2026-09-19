@@ -1,1 +1,4 @@
+Recolorability of (2K_2, K_4)-Free Graphs
+Finite certificate verifier
 
+Verifier initialized successfully.
