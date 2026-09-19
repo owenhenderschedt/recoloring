@@ -11,7 +11,7 @@ Python 3; no external packages are required.
 
 from itertools import combinations, product
 
-from certificates import K0
+from certificates import CERTIFICATES
 
 
 def make_graph(vertices, edges):
@@ -104,9 +104,12 @@ def is_2k2_k4_free(G):
         S = set(four_vertices)
         number_of_edges = edge_count(G, S)
 
+        # K_4.
         if number_of_edges == 6:
             return False
 
+        # An induced 2K_2 has two edges and degree one at
+        # each of its four vertices.
         if (
             number_of_edges == 2
             and all(len(G[u] & S) == 1 for u in S)
@@ -310,13 +313,22 @@ def profile_label(kind, i, bits):
     return f"{cycle_type}[{bits}]"
 
 
-def admissible_profiles(G, off_cycle_order):
+def admissible_profiles(
+    G,
+    off_cycle_order,
+    excluded_cycle_types=(),
+):
     """
-    Return all one-vertex admissible profiles relative to the core G.
+    Return all one-vertex admissible profiles relative to the core G,
+    after imposing any branch restrictions on cycle types.
     """
+    excluded_cycle_types = set(excluded_cycle_types)
     profiles = []
 
     for kind, i in all_cycle_types():
+        if (kind, i) in excluded_cycle_types:
+            continue
+
         for bit_tuple in product(
             "01",
             repeat=len(off_cycle_order),
@@ -354,6 +366,7 @@ def verify_certificate(certificate):
     computed_profiles = admissible_profiles(
         G,
         certificate["off_cycle_order"],
+        certificate["excluded_cycle_types"],
     )
 
     expected_profiles = certificate["admissible_profiles"]
@@ -484,14 +497,15 @@ def main():
     print()
 
     run_internal_tests()
-
-    number_of_profiles = verify_certificate(K0)
-
     print("Internal tests passed.")
-    print(
-        f"{K0['name']}: "
-        f"{number_of_profiles} admissible profiles verified."
-    )
+
+    for certificate in CERTIFICATES:
+        number_of_profiles = verify_certificate(certificate)
+
+        print(
+            f"{certificate['name']}: "
+            f"{number_of_profiles} admissible profiles verified."
+        )
 
 
 if __name__ == "__main__":
