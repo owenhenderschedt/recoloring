@@ -1,0 +1,31 @@
+name: Finite certificate verifier
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify finite certificates
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check Python syntax
+        run: python -m py_compile verify.py certificates.py
+
+      - name: Run finite certificate verifier
+        run: python verify.py > actual_output.txt
+
+      - name: Compare with expected output
+        run: diff -u expected_output.txt actual_output.txt
