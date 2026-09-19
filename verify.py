@@ -688,10 +688,14 @@ def verify_obstruction_relations(
             relation,
         )
 
-        obstruction_name = data["obstruction"]
+        obstruction_name = data[
+            "obstruction"
+        ]
 
         obstruction_definition = (
-            OBSTRUCTIONS[obstruction_name]
+            OBSTRUCTIONS[
+                obstruction_name
+            ]
         )
 
         obstruction_graph = build_core(
@@ -716,6 +720,14 @@ def verify_elimination_rounds(
     """
     Verify the elimination rounds of a finite certificate.
 
+    For each elimination row the program checks:
+
+      (1) the displayed local comparison;
+      (2) the complete list of possible rescuer profiles;
+      (3) that every possible rescuer is unavailable, either because
+          it was eliminated in an earlier round or because the required
+          relation creates a recorded obstruction.
+
     Profiles in one round are removed simultaneously.
     """
     available = list(profile_map)
@@ -727,9 +739,8 @@ def verify_elimination_rounds(
 
     for round_data in rounds:
 
-        # All rows are checked against the same set of profiles:
-        # those available at the start of the round.
-
+        # Every row in this round is checked against the profiles
+        # available at the beginning of the round.
         profiles_to_remove = []
 
         for row in round_data:
@@ -756,6 +767,14 @@ def verify_elimination_rounds(
                 available,
             )
 
+            expected_rescuers = row[
+                "expected_rescuers"
+            ]
+
+            # This checks that the rescuer list stated in the
+            # certificate is exhaustive.
+            assert raw_rescuers == expected_rescuers
+
             relation = rescue_relation(
                 direction
             )
@@ -771,13 +790,14 @@ def verify_elimination_rounds(
                 )
             ]
 
+            # Every possible rescuer must now be unavailable.
             assert remaining_rescuers == []
 
             profiles_to_remove.append(
                 sigma
             )
 
-        # The round is simultaneous.
+        # Profiles in one round disappear simultaneously.
         available = [
             sigma
             for sigma in available
@@ -789,7 +809,6 @@ def verify_elimination_rounds(
     )
 
     if expected_survivors is not None:
-
         assert set(available) == set(
             expected_survivors
         )
