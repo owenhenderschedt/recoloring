@@ -5,3 +5,4 @@ Basic graph tests passed.
 One-vertex attachment tests passed.
 Two-vertex attachment tests passed.
 Cycle types and attachment profiles passed.
+Worked core K0: 23 admissible profiles verified.
