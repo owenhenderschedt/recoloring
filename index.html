@@ -25,97 +25,58 @@
 
 <body>
 
-<h1>Recolorability of \((2K_2,K_4)\)-Free Graphs</h1>
+<main>
 
-<p>
-This page collects two papers by Henry Echeverría and Owen Henderschedt
-on the recolorability of \((2K_2,K_4)\)-free graphs, together with the
-computer-assisted verification accompanying the second paper.
-</p>
+  <h1>Recolorability of \((2K_2,K_4)\)-Free Graphs</h1>
+
+  <h2>Henry Echeverría and Owen Henderschedt</h2>
+
+  <p>
+    This page contains computer-assisted parts of our work on the
+    recolorability of \((2K_2,K_4)\)-free graphs.
+  </p>
 
 
-<h2>Papers</h2>
+  <section class="papers">
 
-<div class="papers-grid">
+    <div class="paper">
+      <h3>On the recolorability of \((2K_2,K_4)\)-free graphs</h3>
 
-  <div class="paper">
-    <div class="paper-title">
-      On the recolorability of \((2K_2,K_4)\)-free graphs
+      <p>Henry Echeverría and Owen Henderschedt</p>
+
+      <p>
+        <a href="https://arxiv.org/abs/2607.07860"
+           target="_blank"
+           rel="noopener noreferrer">
+          arXiv:2607.07860
+        </a>
+      </p>
     </div>
 
-    <div class="paper-authors">
-      Henry Echeverría and Owen Henderschedt
+
+    <div class="paper">
+      <h3>Yes, \((2K_2,K_4)\)-free graphs are recolorable</h3>
+
+      <p>Henry Echeverría and Owen Henderschedt</p>
+
+      <p class="forthcoming">
+        arXiv forthcoming
+      </p>
     </div>
 
-    <div class="paper-link">
-      <a
-        href="https://arxiv.org/abs/2607.07860"
-        target="_blank"
-        rel="noopener noreferrer">
-        arXiv:2607.07860
-      </a>
-    </div>
-  </div>
+  </section>
 
 
-  <div class="paper">
-    <div class="paper-title">
-      Yes, \((2K_2,K_4)\)-free graphs are recolorable
-    </div>
+  <p class="verification">
+    The verification code for the second paper is available
+    <a href="https://github.com/owenhenderschedt/recoloring"
+       target="_blank"
+       rel="noopener noreferrer">
+      here
+    </a>.
+  </p>
 
-    <div class="paper-authors">
-      Henry Echeverría and Owen Henderschedt
-    </div>
-
-    <div class="paper-link">
-      <span class="forthcoming">arXiv forthcoming</span>
-    </div>
-  </div>
-
-</div>
-
-
-<h2>Computer-assisted verification</h2>
-
-<p>
-The code in this repository accompanies
-<em>Yes, \((2K_2,K_4)\)-free graphs are recolorable</em>.
-It verifies the finite attachment-profile calculations used in the proof
-of that paper.
-</p>
-
-<p>
-More specifically, the verifier checks the admissible profiles for the
-finite cores appearing in the argument, the local neighborhood
-comparisons, the complete lists of possible rescuers, the elimination
-rounds and surviving profiles, and the explicit induced copies of the
-obstruction graphs \(B_{10}\) and \(B_{11}\).
-</p>
-
-<p>
-The structural reductions and recoloring arguments are proved in the
-paper. The computation is used for the exhaustive finite bookkeeping
-arising from those reductions.
-</p>
-
-
-<h2>Code</h2>
-
-<p>
-The verification code, certificate data, expected output, and
-reproduction instructions are available in the
-<a
-  href="https://github.com/owenhenderschedt/recoloring"
-  target="_blank"
-  rel="noopener noreferrer">
-  GitHub repository
-</a>.
-</p>
-
-<p>
-The verifier is written in Python 3, requires no external packages, and
-is run automatically through GitHub Actions.
-</p>
+</main>
 
 </body>
 
