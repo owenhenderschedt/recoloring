@@ -3542,6 +3542,44 @@ CERT_B20 = {
 }
 
 
+# ---------------------------------------------------------------------
+# Appendix C auxiliary obstruction check
+#
+# C.14 occurs in Claim 11 before the Appendix B.7/B.8 certificates.
+# Its core is (C; f,a,y), where f is of type F1, a is of type Y1,
+# and y is of type Y3 adjacent to f and a.  The stated edge between
+# Y5[010] and R5[110] must create the indicated induced B10.
+# ---------------------------------------------------------------------
+
+APPENDIX_C14 = {
+    "name": "C.14",
+
+    "off_cycle_order": ["f", "a", "y"],
+
+    "construction": [
+        ("f", "F", 1, []),
+        ("a", "Y", 1, []),
+        ("y", "Y", 3, ["f", "a"]),
+    ],
+
+    "excluded_cycle_types": [],
+
+    "sigma": "Y5[010]",
+    "tau": "R5[110]",
+    "relation": "edge",
+    "obstruction": "B10",
+    "witness": [
+        "c1", "c2", "f", "c4", "a",
+        "c3", "c5", "w", "y", "v",
+    ],
+}
+
+
+AUXILIARY_OBSTRUCTION_CHECKS = [
+    APPENDIX_C14,
+]
+
+
 CERTIFICATES = [
     K0,
     CERT_B1,
