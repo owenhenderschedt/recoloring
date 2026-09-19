@@ -51,6 +51,21 @@ def is_triangle_free(G, vertices):
     return True
 
 
+def is_complete_between(G, A, B):
+    """
+    Return True exactly when every vertex of A is adjacent to
+    every vertex of B.
+    """
+    A = set(A)
+    B = set(B)
+
+    for u in A:
+        if not B <= G[u]:
+            return False
+
+    return True
+
+
 def one_vertex_admissible(G, S):
     """
     Test the one-vertex attachment rule.
@@ -62,9 +77,6 @@ def one_vertex_admissible(G, S):
 
       (ii) for every h in S, the vertices outside
            S union N_G(h) form an independent set.
-
-    These are precisely the conditions preventing a new K_4 or
-    induced 2K_2 containing x.
     """
     S = set(S)
     V = set(G)
@@ -81,6 +93,46 @@ def one_vertex_admissible(G, S):
             return False
 
     return True
+
+
+def nonedge_permitted(G, S, T):
+    """
+    Test whether two individually admissible new vertices x and y,
+    with core neighborhoods S and T, may be nonadjacent.
+
+    By the two-vertex attachment rule, xy is permitted as a nonedge
+    exactly when S - T is complete to T - S.
+    """
+    S = set(S)
+    T = set(T)
+    V = set(G)
+
+    assert S <= V
+    assert T <= V
+
+    return is_complete_between(G, S - T, T - S)
+
+
+def edge_permitted(G, S, T):
+    """
+    Test whether two individually admissible new vertices x and y,
+    with core neighborhoods S and T, may be adjacent.
+
+    By the two-vertex attachment rule, xy is permitted as an edge
+    exactly when both S intersect T and the vertices outside
+    S union T are independent.
+    """
+    S = set(S)
+    T = set(T)
+    V = set(G)
+
+    assert S <= V
+    assert T <= V
+
+    return (
+        is_independent(G, S & T)
+        and is_independent(G, V - (S | T))
+    )
 
 
 def main():
@@ -104,16 +156,15 @@ def main():
     assert is_triangle_free(path, {0, 1, 2})
     assert not is_triangle_free(triangle, {0, 1, 2})
 
-    # Condition (i): attaching a vertex to all three vertices of a
-    # triangle would create K_4.
+    # One-vertex attachment tests.
+
+    # Failure by K_4.
     assert not one_vertex_admissible(
         triangle,
         {0, 1, 2},
     )
 
-    # Condition (ii): if the core consists of an edge 0--1 and an
-    # isolated vertex 2, attaching a new vertex only to 2 would
-    # create the induced 2K_2 with edges x2 and 01.
+    # Failure by induced 2K_2.
     edge_and_isolated = make_graph(
         vertices=[0, 1, 2],
         edges=[(0, 1)],
@@ -124,8 +175,7 @@ def main():
         {2},
     )
 
-    # A vertex adjacent to every vertex of an induced C_5 passes
-    # the one-vertex attachment test.
+    # Valid attachment to an induced C_5.
     cycle5 = make_graph(
         vertices=[0, 1, 2, 3, 4],
         edges=[
@@ -142,8 +192,54 @@ def main():
         {0, 1, 2, 3, 4},
     )
 
+    # Two-vertex attachment tests.
+
+    # Here S - T = {0} and T - S = {1}.
+    # Since 01 is an edge, the nonedge between the two new vertices
+    # is permitted.
+    single_edge = make_graph(
+        vertices=[0, 1],
+        edges=[(0, 1)],
+    )
+
+    assert nonedge_permitted(
+        single_edge,
+        {0},
+        {1},
+    )
+
+    # If 01 is absent, the same proposed nonedge creates an induced
+    # 2K_2, so it is not permitted.
+    two_isolated = make_graph(
+        vertices=[0, 1],
+        edges=[],
+    )
+
+    assert not nonedge_permitted(
+        two_isolated,
+        {0},
+        {1},
+    )
+
+    # For an edge between two new vertices, a common adjacent pair
+    # in the core would create a K_4.
+    assert not edge_permitted(
+        single_edge,
+        {0, 1},
+        {0, 1},
+    )
+
+    # If the common neighborhood and the vertices outside S union T
+    # are both independent, the edge is permitted.
+    assert edge_permitted(
+        path,
+        {0, 1},
+        {1, 2},
+    )
+
     print("Basic graph tests passed.")
     print("One-vertex attachment tests passed.")
+    print("Two-vertex attachment tests passed.")
 
 
 if __name__ == "__main__":
