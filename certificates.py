@@ -146,18 +146,6 @@ A1 = {
         "R5[111]",
     ],
 
-    # Each comparison has one of the following forms:
-    #
-    #   profile_le_core:
-    #       N_K(v) is contained in N_K(h).
-    #
-    #   core_le_profile:
-    #       N_K(h) is contained in N_K(v).
-    #
-    # The expected_rescuers field records the complete list of
-    # profiles that can rescue the comparison at the beginning
-    # of that elimination round.
-
     "elimination_rounds": [
         [
             {
@@ -198,13 +186,6 @@ A1 = {
         ],
     ],
 
-    # The only formally possible rescuer of
-    #
-    #     c2 <=_K Y3[110]
-    #
-    # has profile R1[111] and must be nonadjacent to the
-    # Y3[110]-vertex. The resulting extension induces B10.
-
     "obstruction_relations": [
         {
             "sigma": "Y3[110]",
@@ -212,11 +193,6 @@ A1 = {
             "relation": "nonedge",
             "obstruction": "B10",
 
-            # These vertices correspond, in order, to
-            #
-            # (c1,c2,c3,c4,c5,f,a,g,y,r)
-            #
-            # in the defining copy of B10.
             "witness": [
                 "c1", "c2", "c3", "c4", "c5",
                 "f", "a", "g", "v", "w",
