@@ -428,10 +428,14 @@ def admissible_profile_neighborhoods(
     off_cycle_order,
     excluded_cycle_types=(),
     required_bits=(),
+    excluded_profiles=(),
 ):
     """Return the admissible profiles and their core neighborhoods."""
     excluded_cycle_types = set(
         excluded_cycle_types
+    )
+    excluded_profiles = set(
+        excluded_profiles
     )
 
     profiles = {}
@@ -467,6 +471,9 @@ def admissible_profile_neighborhoods(
                     i,
                     bits,
                 )
+
+                if label in excluded_profiles:
+                    continue
 
                 profiles[label] = S
 
@@ -1118,6 +1125,71 @@ def verify_relation_table(
 
 
 
+def verify_core_comparisons(
+    G,
+    profile_map,
+    certificate,
+    surviving_profiles,
+):
+    """Verify reducedness comparisons recorded after the elimination rounds."""
+    name = certificate["name"]
+
+    for data in certificate.get(
+        "core_comparisons",
+        [],
+    ):
+        left = data["left"]
+        right = data["right"]
+
+        check(
+            left in G and right in G,
+            (
+                f"{name}: unknown core vertex in comparison "
+                f"{left} <= {right}."
+            ),
+        )
+
+        check(
+            right not in G[left],
+            (
+                f"{name}: the compared core vertices {left} and {right} "
+                "are adjacent."
+            ),
+        )
+
+        check(
+            G[left] <= G[right],
+            (
+                f"{name}: the claimed core comparison "
+                f"{left} <= {right} fails."
+            ),
+        )
+
+        computed_rescuers = [
+            profile
+            for profile in surviving_profiles
+            if (
+                left in profile_map[profile]
+                and right not in profile_map[profile]
+            )
+        ]
+
+        expected_rescuers = data[
+            "expected_rescuers"
+        ]
+
+        check(
+            computed_rescuers == expected_rescuers,
+            (
+                f"{name}: core-comparison rescuer mismatch for "
+                f"{left} <= {right}.\n"
+                f"Expected: {expected_rescuers}\n"
+                f"Computed: {computed_rescuers}"
+            ),
+        )
+
+
+
 def verify_certificate(certificate):
     """Verify the finite data attached to one core certificate."""
     name = certificate["name"]
@@ -1134,6 +1206,7 @@ def verify_certificate(certificate):
         certificate["off_cycle_order"],
         certificate["excluded_cycle_types"],
         certificate.get("required_bits", []),
+        certificate.get("excluded_profiles", []),
     )
 
     computed_profiles = list(
@@ -1169,6 +1242,13 @@ def verify_certificate(certificate):
         G,
         profile_map,
         certificate,
+    )
+
+    verify_core_comparisons(
+        G,
+        profile_map,
+        certificate,
+        survivors,
     )
 
     relation_table_verified = verify_relation_table(
@@ -1370,8 +1450,9 @@ def main():
             certificate
         )
 
-        if certificate.get(
-            "elimination_rounds"
+        if (
+            certificate.get("elimination_rounds")
+            or number_direct_excluded
         ):
 
             number_eliminated_in_rounds = (
