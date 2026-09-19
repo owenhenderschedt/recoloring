@@ -11,6 +11,8 @@ Python 3; no external packages are required.
 
 from itertools import combinations, product
 
+from certificates import K0
+
 
 def make_graph(vertices, edges):
     """
@@ -97,20 +99,14 @@ def is_2k2_k4_free(G):
     """
     Return True exactly when G contains neither an induced 2K_2
     nor a K_4.
-
-    Since both forbidden graphs have four vertices, it is enough
-    to examine every four-element subset.
     """
     for four_vertices in combinations(G, 4):
         S = set(four_vertices)
         number_of_edges = edge_count(G, S)
 
-        # Six edges on four vertices gives K_4.
         if number_of_edges == 6:
             return False
 
-        # An induced graph on four vertices is 2K_2 exactly when
-        # it has two edges and every vertex has degree one.
         if (
             number_of_edges == 2
             and all(len(G[u] & S) == 1 for u in S)
@@ -153,9 +149,6 @@ def nonedge_permitted(G, S, T):
     """
     Test whether two individually admissible new vertices x and y,
     with core neighborhoods S and T, may be nonadjacent.
-
-    By the two-vertex attachment rule, xy is permitted as a nonedge
-    exactly when S - T is complete to T - S.
     """
     S = set(S)
     T = set(T)
@@ -171,10 +164,6 @@ def edge_permitted(G, S, T):
     """
     Test whether two individually admissible new vertices x and y,
     with core neighborhoods S and T, may be adjacent.
-
-    By the two-vertex attachment rule, xy is permitted as an edge
-    exactly when both S intersect T and the vertices outside
-    S union T are independent.
     """
     S = set(S)
     T = set(T)
@@ -203,8 +192,6 @@ def cycle_neighborhood(kind, i=None):
     """
     Return the prescribed neighborhood on the fixed 5-cycle
     for one of the cycle types U, Z, F_i, Y_i, R_i.
-
-    The cycle is c1 c2 c3 c4 c5 c1.
     """
     C = {cycle_vertex(j) for j in range(1, 6)}
 
@@ -239,11 +226,6 @@ def cycle_neighborhood(kind, i=None):
 def profile_neighborhood(kind, i, bits, off_cycle_order):
     """
     Return the neighborhood in the core prescribed by an attachment profile.
-
-    kind, i specify the cycle type. For U and Z, use i=None.
-
-    bits is a string of 0s and 1s, read in the order given by
-    off_cycle_order.
     """
     assert len(bits) == len(off_cycle_order)
     assert all(bit in {"0", "1"} for bit in bits)
@@ -278,9 +260,6 @@ def add_typed_vertex(
 ):
     """
     Add an off-cycle vertex of a specified cycle type.
-
-    earlier_neighbors lists its neighbors among off-cycle vertices
-    already present in the core.
     """
     neighborhood = (
         cycle_neighborhood(kind, i)
@@ -288,6 +267,27 @@ def add_typed_vertex(
     )
 
     add_vertex(G, vertex, neighborhood)
+
+
+def build_core(certificate):
+    """
+    Construct the core specified by a certificate.
+
+    The construction begins with the fixed C_5 and adds the
+    off-cycle vertices in the displayed order.
+    """
+    G = fixed_cycle()
+
+    for vertex, kind, i, earlier_neighbors in certificate["construction"]:
+        add_typed_vertex(
+            G,
+            vertex,
+            kind,
+            i,
+            earlier_neighbors,
+        )
+
+    return G
 
 
 def all_cycle_types():
@@ -313,8 +313,6 @@ def profile_label(kind, i, bits):
 def admissible_profiles(G, off_cycle_order):
     """
     Return all one-vertex admissible profiles relative to the core G.
-
-    The profiles are returned in a fixed deterministic order.
     """
     profiles = []
 
@@ -340,14 +338,33 @@ def admissible_profiles(G, off_cycle_order):
     return profiles
 
 
-def main():
-    print("Recolorability of (2K_2, K_4)-Free Graphs")
-    print("Finite certificate verifier")
-    print()
+def verify_certificate(certificate):
+    """
+    Verify the basic data attached to one core certificate.
 
-    # ------------------------------------------------------------
-    # Basic cycle-type tests
-    # ------------------------------------------------------------
+    At this stage this checks:
+      - the core is (2K_2, K_4)-free;
+      - the computed admissible profiles agree exactly with
+        the list stated in the certificate.
+    """
+    G = build_core(certificate)
+
+    assert is_2k2_k4_free(G)
+
+    computed_profiles = admissible_profiles(
+        G,
+        certificate["off_cycle_order"],
+    )
+
+    expected_profiles = certificate["admissible_profiles"]
+
+    assert computed_profiles == expected_profiles
+
+    return len(computed_profiles)
+
+
+def run_internal_tests():
+    """Run small sanity checks for the basic verification routines."""
 
     assert cycle_neighborhood("U") == {
         "c1", "c2", "c3", "c4", "c5"
@@ -380,10 +397,6 @@ def main():
         "c2", "c4", "c5", "f", "a"
     }
 
-    # ------------------------------------------------------------
-    # Basic graph tests
-    # ------------------------------------------------------------
-
     path = make_graph(
         vertices=[0, 1, 2],
         edges=[(0, 1), (1, 2)],
@@ -398,10 +411,6 @@ def main():
     assert not is_independent(path, {0, 1})
     assert is_triangle_free(path, {0, 1, 2})
     assert not is_triangle_free(triangle, {0, 1, 2})
-
-    # ------------------------------------------------------------
-    # One-vertex attachment tests
-    # ------------------------------------------------------------
 
     assert not one_vertex_admissible(
         triangle,
@@ -433,10 +442,6 @@ def main():
         cycle5,
         {0, 1, 2, 3, 4},
     )
-
-    # ------------------------------------------------------------
-    # Two-vertex attachment tests
-    # ------------------------------------------------------------
 
     single_edge = make_graph(
         vertices=[0, 1],
@@ -472,71 +477,21 @@ def main():
         {1, 2},
     )
 
-    # ------------------------------------------------------------
-    # Worked core K0 = (C; f, a)
-    #
-    # f is in F_1,
-    # a is in Y_1,
-    # and fa is a nonedge.
-    # ------------------------------------------------------------
 
-    K0 = fixed_cycle()
+def main():
+    print("Recolorability of (2K_2, K_4)-Free Graphs")
+    print("Finite certificate verifier")
+    print()
 
-    add_typed_vertex(
-        K0,
-        "f",
-        "F",
-        1,
+    run_internal_tests()
+
+    number_of_profiles = verify_certificate(K0)
+
+    print("Internal tests passed.")
+    print(
+        f"{K0['name']}: "
+        f"{number_of_profiles} admissible profiles verified."
     )
-
-    add_typed_vertex(
-        K0,
-        "a",
-        "Y",
-        1,
-    )
-
-    assert "a" not in K0["f"]
-    assert is_2k2_k4_free(K0)
-
-    K0_expected_profiles = [
-        "U[00]",
-        "Z[00]",
-        "Z[11]",
-        "F1[00]",
-        "F2[00]",
-        "F5[00]",
-        "Y1[00]",
-        "Y2[01]",
-        "Y3[10]",
-        "Y3[11]",
-        "Y4[10]",
-        "Y4[11]",
-        "Y5[01]",
-        "R1[01]",
-        "R1[11]",
-        "R2[10]",
-        "R2[11]",
-        "R3[00]",
-        "R3[11]",
-        "R4[00]",
-        "R4[11]",
-        "R5[10]",
-        "R5[11]",
-    ]
-
-    K0_computed_profiles = admissible_profiles(
-        K0,
-        ["f", "a"],
-    )
-
-    assert K0_computed_profiles == K0_expected_profiles
-
-    print("Basic graph tests passed.")
-    print("One-vertex attachment tests passed.")
-    print("Two-vertex attachment tests passed.")
-    print("Cycle types and attachment profiles passed.")
-    print("Worked core K0: 23 admissible profiles verified.")
 
 
 if __name__ == "__main__":
