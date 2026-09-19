@@ -1,6 +1,7 @@
-Recolorability of (2K_2, K_4)-Free Graphs
+Yes, (2K_2, K_4)-free graphs are recolorable
 Finite certificate verifier
 
 Internal tests passed.
 K0: 23 admissible profiles verified.
-A.1: 22 admissible profiles; 5 eliminated; 17 survive.
+B.5: 22 admissible profiles; 5 eliminated; 17 survive.
+B10: 21 admissible profiles; 15 eliminated; 6 survive. Relation table verified.
