@@ -484,6 +484,25 @@ def same_ordered_graph(
 
 
 
+def build_one_profile_extension(
+    G,
+    S,
+):
+    """Add one new vertex v to the core with core neighborhood S."""
+    H = copy_graph(G)
+
+    assert "v" not in H
+
+    add_vertex(
+        H,
+        "v",
+        S,
+    )
+
+    return H
+
+
+
 def build_two_profile_extension(
     G,
     S,
@@ -644,6 +663,80 @@ def possible_rescuers(
 
 
 
+def verify_direct_exclusions(
+    G,
+    profile_map,
+    certificate,
+):
+    """
+    Verify profiles that are individually admissible but are excluded
+    because adjoining a vertex with that profile creates a forbidden
+    induced obstruction.
+    """
+    name = certificate["name"]
+    excluded = []
+
+    for data in certificate.get(
+        "direct_exclusions",
+        [],
+    ):
+        profile = data["profile"]
+        label = data.get("label", "direct exclusion")
+
+        check(
+            profile in profile_map,
+            f"{name}, {label}: profile {profile} is not admissible.",
+        )
+
+        obstruction_name = data["obstruction"]
+
+        check(
+            obstruction_name in OBSTRUCTIONS,
+            (
+                f"{name}, {label}: unknown obstruction "
+                f"{obstruction_name}."
+            ),
+        )
+
+        extension = build_one_profile_extension(
+            G,
+            profile_map[profile],
+        )
+
+        obstruction_definition = OBSTRUCTIONS[
+            obstruction_name
+        ]
+
+        obstruction_graph = build_core(
+            obstruction_definition
+        )
+
+        check(
+            same_ordered_graph(
+                extension,
+                data["witness"],
+                obstruction_graph,
+                obstruction_definition[
+                    "ordered_vertices"
+                ],
+            ),
+            (
+                f"{name}, {label}: the stated {obstruction_name} "
+                f"witness for {profile} is incorrect."
+            ),
+        )
+
+        excluded.append(profile)
+
+    check(
+        len(excluded) == len(set(excluded)),
+        f"{name}: a profile appears more than once among direct exclusions.",
+    )
+
+    return excluded
+
+
+
 def obstruction_forbids_relation(
     certificate,
     sigma,
@@ -795,8 +888,22 @@ def verify_elimination_rounds(
     Profiles in one round are removed simultaneously.
     """
     name = certificate["name"]
-    all_profiles = list(profile_map)
-    available = list(profile_map)
+
+    direct_excluded = {
+        data["profile"]
+        for data in certificate.get(
+            "direct_exclusions",
+            [],
+        )
+    }
+
+    all_profiles = [
+        profile
+        for profile in profile_map
+        if profile not in direct_excluded
+    ]
+
+    available = list(all_profiles)
 
     rounds = certificate.get(
         "elimination_rounds",
@@ -1019,6 +1126,12 @@ def verify_certificate(certificate):
         ),
     )
 
+    direct_excluded = verify_direct_exclusions(
+        G,
+        profile_map,
+        certificate,
+    )
+
     verify_obstruction_relations(
         G,
         profile_map,
@@ -1039,6 +1152,7 @@ def verify_certificate(certificate):
 
     return (
         len(profile_map),
+        len(direct_excluded),
         len(survivors),
         relation_table_verified,
     )
@@ -1222,6 +1336,7 @@ def main():
 
         (
             number_of_profiles,
+            number_direct_excluded,
             number_of_survivors,
             relation_table_verified,
         ) = verify_certificate(
@@ -1232,15 +1347,24 @@ def main():
             "elimination_rounds"
         ):
 
-            number_eliminated = (
+            number_eliminated_in_rounds = (
                 number_of_profiles
+                - number_direct_excluded
                 - number_of_survivors
             )
 
             line = (
                 f"{certificate['name']}: "
                 f"{number_of_profiles} admissible profiles; "
-                f"{number_eliminated} eliminated; "
+            )
+
+            if number_direct_excluded:
+                line += (
+                    f"{number_direct_excluded} directly excluded; "
+                )
+
+            line += (
+                f"{number_eliminated_in_rounds} eliminated; "
                 f"{number_of_survivors} survive."
             )
 
