@@ -135,10 +135,117 @@ def edge_permitted(G, S, T):
     )
 
 
+def cycle_vertex(i):
+    """
+    Return c_i, with indices interpreted modulo 5.
+
+    Thus cycle_vertex(6) = "c1" and cycle_vertex(0) = "c5".
+    """
+    i = ((i - 1) % 5) + 1
+    return f"c{i}"
+
+
+def cycle_neighborhood(kind, i=None):
+    """
+    Return the prescribed neighborhood on the fixed 5-cycle
+    for one of the cycle types U, Z, F_i, Y_i, R_i.
+
+    The cycle is c1 c2 c3 c4 c5 c1.
+    """
+    C = {cycle_vertex(j) for j in range(1, 6)}
+
+    if kind == "U":
+        assert i is None
+        return C
+
+    if kind == "Z":
+        assert i is None
+        return set()
+
+    assert kind in {"F", "Y", "R"}
+    assert i is not None
+
+    if kind == "F":
+        return C - {cycle_vertex(i)}
+
+    if kind == "Y":
+        return {
+            cycle_vertex(i),
+            cycle_vertex(i - 2),
+            cycle_vertex(i + 2),
+        }
+
+    if kind == "R":
+        return {
+            cycle_vertex(i - 1),
+            cycle_vertex(i + 1),
+        }
+
+
+def profile_neighborhood(kind, i, bits, off_cycle_order):
+    """
+    Return the neighborhood in the core prescribed by an attachment profile.
+
+    kind, i specify the cycle type. For U and Z, use i=None.
+
+    bits is a string of 0s and 1s, read in the order given by
+    off_cycle_order.
+
+    Example:
+        profile_neighborhood("Y", 2, "110", ["f", "a", "g"])
+
+    represents the profile Y_2[110].
+    """
+    assert len(bits) == len(off_cycle_order)
+    assert all(bit in {"0", "1"} for bit in bits)
+
+    S = cycle_neighborhood(kind, i)
+
+    for bit, vertex in zip(bits, off_cycle_order):
+        if bit == "1":
+            S.add(vertex)
+
+    return S
+
+
 def main():
     print("Recolorability of (2K_2, K_4)-Free Graphs")
     print("Finite certificate verifier")
     print()
+
+    # Cycle-type tests.
+    assert cycle_neighborhood("U") == {
+        "c1", "c2", "c3", "c4", "c5"
+    }
+
+    assert cycle_neighborhood("Z") == set()
+
+    assert cycle_neighborhood("F", 1) == {
+        "c2", "c3", "c4", "c5"
+    }
+
+    assert cycle_neighborhood("Y", 1) == {
+        "c1", "c3", "c4"
+    }
+
+    assert cycle_neighborhood("R", 1) == {
+        "c2", "c5"
+    }
+
+    # Indices are taken modulo 5.
+    assert cycle_neighborhood("Y", 5) == {
+        "c2", "c3", "c5"
+    }
+
+    # Profile test: Y_2[110] relative to (f, a, g).
+    assert profile_neighborhood(
+        "Y",
+        2,
+        "110",
+        ["f", "a", "g"],
+    ) == {
+        "c2", "c4", "c5", "f", "a"
+    }
 
     # Basic graph tests.
     path = make_graph(
@@ -221,8 +328,8 @@ def main():
         {1},
     )
 
-    # For an edge between two new vertices, a common adjacent pair
-    # in the core would create a K_4.
+    # For an edge between two new vertices, an edge in their common
+    # neighborhood would create a K_4.
     assert not edge_permitted(
         single_edge,
         {0, 1},
@@ -240,6 +347,7 @@ def main():
     print("Basic graph tests passed.")
     print("One-vertex attachment tests passed.")
     print("Two-vertex attachment tests passed.")
+    print("Cycle types and attachment profiles passed.")
 
 
 if __name__ == "__main__":
