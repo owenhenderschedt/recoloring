@@ -2,3 +2,4 @@ Recolorability of (2K_2, K_4)-Free Graphs
 Finite certificate verifier
 
 Basic graph tests passed.
+One-vertex attachment tests passed.
