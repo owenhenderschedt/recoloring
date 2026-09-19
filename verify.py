@@ -11,25 +11,31 @@ Python 3; no external packages are required.
 
 from itertools import combinations, product
 
-from certificates import CERTIFICATES
+from certificates import CERTIFICATES, OBSTRUCTIONS
 
 
 def make_graph(vertices, edges):
     """
     Return the adjacency dictionary of a finite simple graph.
-
-    vertices is an iterable of vertex labels.
-    edges is an iterable of unordered pairs (u, v).
     """
     G = {v: set() for v in vertices}
 
     for u, v in edges:
         assert u in G and v in G
         assert u != v
+
         G[u].add(v)
         G[v].add(u)
 
     return G
+
+
+def copy_graph(G):
+    """Return a copy of G."""
+    return {
+        v: set(neighbors)
+        for v, neighbors in G.items()
+    }
 
 
 def add_vertex(G, vertex, neighbors):
@@ -50,8 +56,20 @@ def add_vertex(G, vertex, neighbors):
         G[u].add(vertex)
 
 
+def add_edge(G, u, v):
+    """Add the edge uv to G."""
+    assert u in G and v in G
+    assert u != v
+
+    G[u].add(v)
+    G[v].add(u)
+
+
 def is_independent(G, vertices):
-    """Return True exactly when the given vertices induce an independent set."""
+    """
+    Return True exactly when the given vertices induce
+    an independent set.
+    """
     S = set(vertices)
 
     for u in S:
@@ -62,7 +80,9 @@ def is_independent(G, vertices):
 
 
 def is_triangle_free(G, vertices):
-    """Return True exactly when the given vertices induce no triangle."""
+    """
+    Return True exactly when the given vertices induce no triangle.
+    """
     S = set(vertices)
 
     for u in S:
@@ -75,8 +95,8 @@ def is_triangle_free(G, vertices):
 
 def is_complete_between(G, A, B):
     """
-    Return True exactly when every vertex of A is adjacent to
-    every vertex of B.
+    Return True exactly when every vertex of A is adjacent
+    to every vertex of B.
     """
     A = set(A)
     B = set(B)
@@ -92,7 +112,10 @@ def edge_count(G, vertices):
     """Return the number of edges induced by the given vertices."""
     S = set(vertices)
 
-    return sum(len(G[u] & S) for u in S) // 2
+    return sum(
+        len(G[u] & S)
+        for u in S
+    ) // 2
 
 
 def is_2k2_k4_free(G):
@@ -104,15 +127,15 @@ def is_2k2_k4_free(G):
         S = set(four_vertices)
         number_of_edges = edge_count(G, S)
 
-        # K_4.
         if number_of_edges == 6:
             return False
 
-        # An induced 2K_2 has two edges and degree one at
-        # each of its four vertices.
         if (
             number_of_edges == 2
-            and all(len(G[u] & S) == 1 for u in S)
+            and all(
+                len(G[u] & S) == 1
+                for u in S
+            )
         ):
             return False
 
@@ -160,7 +183,11 @@ def nonedge_permitted(G, S, T):
     assert S <= V
     assert T <= V
 
-    return is_complete_between(G, S - T, T - S)
+    return is_complete_between(
+        G,
+        S - T,
+        T - S,
+    )
 
 
 def edge_permitted(G, S, T):
@@ -177,17 +204,17 @@ def edge_permitted(G, S, T):
 
     return (
         is_independent(G, S & T)
-        and is_independent(G, V - (S | T))
+        and
+        is_independent(G, V - (S | T))
     )
 
 
 def cycle_vertex(i):
     """
     Return c_i, with indices interpreted modulo 5.
-
-    Thus cycle_vertex(6) = "c1" and cycle_vertex(0) = "c5".
     """
     i = ((i - 1) % 5) + 1
+
     return f"c{i}"
 
 
@@ -196,7 +223,10 @@ def cycle_neighborhood(kind, i=None):
     Return the prescribed neighborhood on the fixed 5-cycle
     for one of the cycle types U, Z, F_i, Y_i, R_i.
     """
-    C = {cycle_vertex(j) for j in range(1, 6)}
+    C = {
+        cycle_vertex(j)
+        for j in range(1, 6)
+    }
 
     if kind == "U":
         assert i is None
@@ -210,7 +240,9 @@ def cycle_neighborhood(kind, i=None):
     assert i is not None
 
     if kind == "F":
-        return C - {cycle_vertex(i)}
+        return C - {
+            cycle_vertex(i)
+        }
 
     if kind == "Y":
         return {
@@ -226,16 +258,28 @@ def cycle_neighborhood(kind, i=None):
         }
 
 
-def profile_neighborhood(kind, i, bits, off_cycle_order):
+def profile_neighborhood(
+    kind,
+    i,
+    bits,
+    off_cycle_order,
+):
     """
-    Return the neighborhood in the core prescribed by an attachment profile.
+    Return the neighborhood in the core prescribed by
+    an attachment profile.
     """
     assert len(bits) == len(off_cycle_order)
-    assert all(bit in {"0", "1"} for bit in bits)
+    assert all(
+        bit in {"0", "1"}
+        for bit in bits
+    )
 
     S = cycle_neighborhood(kind, i)
 
-    for bit, vertex in zip(bits, off_cycle_order):
+    for bit, vertex in zip(
+        bits,
+        off_cycle_order,
+    ):
         if bit == "1":
             S.add(vertex)
 
@@ -243,15 +287,26 @@ def profile_neighborhood(kind, i, bits, off_cycle_order):
 
 
 def fixed_cycle():
-    """Return the fixed induced cycle c1 c2 c3 c4 c5 c1."""
-    vertices = [cycle_vertex(i) for i in range(1, 6)]
-
-    edges = [
-        (cycle_vertex(i), cycle_vertex(i + 1))
+    """
+    Return the fixed induced cycle c1 c2 c3 c4 c5 c1.
+    """
+    vertices = [
+        cycle_vertex(i)
         for i in range(1, 6)
     ]
 
-    return make_graph(vertices, edges)
+    edges = [
+        (
+            cycle_vertex(i),
+            cycle_vertex(i + 1),
+        )
+        for i in range(1, 6)
+    ]
+
+    return make_graph(
+        vertices,
+        edges,
+    )
 
 
 def add_typed_vertex(
@@ -269,19 +324,26 @@ def add_typed_vertex(
         | set(earlier_neighbors)
     )
 
-    add_vertex(G, vertex, neighborhood)
+    add_vertex(
+        G,
+        vertex,
+        neighborhood,
+    )
 
 
 def build_core(certificate):
     """
     Construct the core specified by a certificate.
-
-    The construction begins with the fixed C_5 and adds the
-    off-cycle vertices in the displayed order.
     """
     G = fixed_cycle()
 
-    for vertex, kind, i, earlier_neighbors in certificate["construction"]:
+    for (
+        vertex,
+        kind,
+        i,
+        earlier_neighbors,
+    ) in certificate["construction"]:
+
         add_typed_vertex(
             G,
             vertex,
@@ -294,7 +356,9 @@ def build_core(certificate):
 
 
 def all_cycle_types():
-    """Iterate through U, Z, and all F_i, Y_i, R_i cycle types."""
+    """
+    Iterate through U, Z, and all F_i, Y_i, R_i cycle types.
+    """
     yield "U", None
     yield "Z", None
 
@@ -304,7 +368,9 @@ def all_cycle_types():
 
 
 def profile_label(kind, i, bits):
-    """Return the paper-style label of an attachment profile."""
+    """
+    Return the paper-style label of an attachment profile.
+    """
     if i is None:
         cycle_type = kind
     else:
@@ -313,19 +379,22 @@ def profile_label(kind, i, bits):
     return f"{cycle_type}[{bits}]"
 
 
-def admissible_profiles(
+def admissible_profile_neighborhoods(
     G,
     off_cycle_order,
     excluded_cycle_types=(),
 ):
     """
-    Return all one-vertex admissible profiles relative to the core G,
-    after imposing any branch restrictions on cycle types.
+    Return the admissible profiles and their core neighborhoods.
     """
-    excluded_cycle_types = set(excluded_cycle_types)
-    profiles = []
+    excluded_cycle_types = set(
+        excluded_cycle_types
+    )
+
+    profiles = {}
 
     for kind, i in all_cycle_types():
+
         if (kind, i) in excluded_cycle_types:
             continue
 
@@ -343,41 +412,439 @@ def admissible_profiles(
             )
 
             if one_vertex_admissible(G, S):
-                profiles.append(
-                    profile_label(kind, i, bits)
+                label = profile_label(
+                    kind,
+                    i,
+                    bits,
                 )
+
+                profiles[label] = S
 
     return profiles
 
 
+def same_ordered_graph(
+    G,
+    ordered_vertices_G,
+    H,
+    ordered_vertices_H,
+):
+    """
+    Test whether the indicated ordered vertex sets have
+    identical adjacency matrices.
+    """
+    assert (
+        len(ordered_vertices_G)
+        ==
+        len(ordered_vertices_H)
+    )
+
+    n = len(ordered_vertices_G)
+
+    for i in range(n):
+        for j in range(i + 1, n):
+
+            u = ordered_vertices_G[i]
+            v = ordered_vertices_G[j]
+
+            x = ordered_vertices_H[i]
+            y = ordered_vertices_H[j]
+
+            edge_in_G = v in G[u]
+            edge_in_H = y in H[x]
+
+            if edge_in_G != edge_in_H:
+                return False
+
+    return True
+
+
+def build_two_profile_extension(
+    G,
+    S,
+    T,
+    relation,
+):
+    """
+    Add two vertices v and w to the core with core neighborhoods
+    S and T and with the specified relation between them.
+    """
+    H = copy_graph(G)
+
+    assert "v" not in H
+    assert "w" not in H
+
+    add_vertex(
+        H,
+        "v",
+        S,
+    )
+
+    add_vertex(
+        H,
+        "w",
+        T,
+    )
+
+    if relation == "edge":
+        add_edge(
+            H,
+            "v",
+            "w",
+        )
+
+    elif relation == "nonedge":
+        pass
+
+    else:
+        raise ValueError(
+            f"Unknown relation: {relation}"
+        )
+
+    return H
+
+
+def verify_local_comparison(
+    G,
+    profile_neighborhood,
+    direction,
+    core_vertex,
+):
+    """
+    Verify the local comparison displayed in an elimination row.
+    """
+    S = set(profile_neighborhood)
+
+    assert core_vertex in G
+    assert core_vertex not in S
+
+    if direction == "profile_le_core":
+
+        assert S <= G[core_vertex]
+
+    elif direction == "core_le_profile":
+
+        assert G[core_vertex] <= S
+
+    else:
+        raise ValueError(
+            f"Unknown comparison direction: {direction}"
+        )
+
+
+def rescue_relation(direction):
+    """
+    Return the relation required between the eliminated profile
+    and a rescuer.
+    """
+    if direction == "profile_le_core":
+        return "edge"
+
+    if direction == "core_le_profile":
+        return "nonedge"
+
+    raise ValueError(
+        f"Unknown comparison direction: {direction}"
+    )
+
+
+def possible_rescuers(
+    G,
+    profile_map,
+    sigma,
+    direction,
+    core_vertex,
+    available_profiles,
+):
+    """
+    Return every available profile that can rescue the displayed
+    local comparison before obstruction exclusions are imposed.
+    """
+    S = profile_map[sigma]
+    rescuers = []
+
+    for tau in available_profiles:
+        T = profile_map[tau]
+
+        if direction == "profile_le_core":
+
+            # sigma <=_K core_vertex.
+            #
+            # A rescuer must be adjacent to sigma and
+            # nonadjacent to core_vertex.
+
+            if (
+                core_vertex not in T
+                and edge_permitted(G, S, T)
+            ):
+                rescuers.append(tau)
+
+        elif direction == "core_le_profile":
+
+            # core_vertex <=_K sigma.
+            #
+            # A rescuer must be adjacent to core_vertex and
+            # nonadjacent to sigma.
+
+            if (
+                core_vertex in T
+                and nonedge_permitted(G, S, T)
+            ):
+                rescuers.append(tau)
+
+        else:
+            raise ValueError(
+                f"Unknown comparison direction: {direction}"
+            )
+
+    return rescuers
+
+
+def obstruction_forbids_relation(
+    certificate,
+    sigma,
+    tau,
+    relation,
+):
+    """
+    Return True exactly when the certificate records that this
+    relation between sigma and tau creates a forbidden obstruction.
+    """
+    for obstruction in certificate.get(
+        "obstruction_relations",
+        [],
+    ):
+
+        same_pair = (
+            (
+                sigma == obstruction["sigma"]
+                and tau == obstruction["tau"]
+            )
+            or
+            (
+                sigma == obstruction["tau"]
+                and tau == obstruction["sigma"]
+            )
+        )
+
+        if (
+            same_pair
+            and relation == obstruction["relation"]
+        ):
+            return True
+
+    return False
+
+
+def verify_obstruction_relations(
+    G,
+    profile_map,
+    certificate,
+):
+    """
+    Verify every explicit obstruction relation recorded
+    for the certificate.
+    """
+    for data in certificate.get(
+        "obstruction_relations",
+        [],
+    ):
+
+        sigma = data["sigma"]
+        tau = data["tau"]
+        relation = data["relation"]
+
+        assert sigma in profile_map
+        assert tau in profile_map
+
+        S = profile_map[sigma]
+        T = profile_map[tau]
+
+        if relation == "edge":
+
+            assert edge_permitted(
+                G,
+                S,
+                T,
+            )
+
+        elif relation == "nonedge":
+
+            assert nonedge_permitted(
+                G,
+                S,
+                T,
+            )
+
+        else:
+            raise ValueError(
+                f"Unknown relation: {relation}"
+            )
+
+        extension = build_two_profile_extension(
+            G,
+            S,
+            T,
+            relation,
+        )
+
+        obstruction_name = data["obstruction"]
+
+        obstruction_definition = (
+            OBSTRUCTIONS[obstruction_name]
+        )
+
+        obstruction_graph = build_core(
+            obstruction_definition
+        )
+
+        assert same_ordered_graph(
+            extension,
+            data["witness"],
+            obstruction_graph,
+            obstruction_definition[
+                "ordered_vertices"
+            ],
+        )
+
+
+def verify_elimination_rounds(
+    G,
+    profile_map,
+    certificate,
+):
+    """
+    Verify the elimination rounds of a finite certificate.
+
+    Profiles in one round are removed simultaneously.
+    """
+    available = list(profile_map)
+
+    rounds = certificate.get(
+        "elimination_rounds",
+        [],
+    )
+
+    for round_data in rounds:
+
+        # All rows are checked against the same set of profiles:
+        # those available at the start of the round.
+
+        profiles_to_remove = []
+
+        for row in round_data:
+
+            sigma = row["profile"]
+            direction = row["direction"]
+            core_vertex = row["core_vertex"]
+
+            assert sigma in available
+
+            verify_local_comparison(
+                G,
+                profile_map[sigma],
+                direction,
+                core_vertex,
+            )
+
+            raw_rescuers = possible_rescuers(
+                G,
+                profile_map,
+                sigma,
+                direction,
+                core_vertex,
+                available,
+            )
+
+            relation = rescue_relation(
+                direction
+            )
+
+            remaining_rescuers = [
+                tau
+                for tau in raw_rescuers
+                if not obstruction_forbids_relation(
+                    certificate,
+                    sigma,
+                    tau,
+                    relation,
+                )
+            ]
+
+            assert remaining_rescuers == []
+
+            profiles_to_remove.append(
+                sigma
+            )
+
+        # The round is simultaneous.
+        available = [
+            sigma
+            for sigma in available
+            if sigma not in profiles_to_remove
+        ]
+
+    expected_survivors = certificate.get(
+        "surviving_profiles"
+    )
+
+    if expected_survivors is not None:
+
+        assert set(available) == set(
+            expected_survivors
+        )
+
+    return available
+
+
 def verify_certificate(certificate):
     """
-    Verify the basic data attached to one core certificate.
-
-    At this stage this checks:
-      - the core is (2K_2, K_4)-free;
-      - the computed admissible profiles agree exactly with
-        the list stated in the certificate.
+    Verify the finite data attached to one core certificate.
     """
     G = build_core(certificate)
 
     assert is_2k2_k4_free(G)
 
-    computed_profiles = admissible_profiles(
-        G,
-        certificate["off_cycle_order"],
-        certificate["excluded_cycle_types"],
+    profile_map = (
+        admissible_profile_neighborhoods(
+            G,
+            certificate[
+                "off_cycle_order"
+            ],
+            certificate[
+                "excluded_cycle_types"
+            ],
+        )
     )
 
-    expected_profiles = certificate["admissible_profiles"]
+    expected_profiles = certificate[
+        "admissible_profiles"
+    ]
 
-    assert computed_profiles == expected_profiles
+    assert list(profile_map) == expected_profiles
 
-    return len(computed_profiles)
+    verify_obstruction_relations(
+        G,
+        profile_map,
+        certificate,
+    )
+
+    survivors = verify_elimination_rounds(
+        G,
+        profile_map,
+        certificate,
+    )
+
+    return (
+        len(profile_map),
+        len(survivors),
+    )
 
 
 def run_internal_tests():
-    """Run small sanity checks for the basic verification routines."""
+    """
+    Run small sanity checks for the basic verification routines.
+    """
 
     assert cycle_neighborhood("U") == {
         "c1", "c2", "c3", "c4", "c5"
@@ -385,19 +852,31 @@ def run_internal_tests():
 
     assert cycle_neighborhood("Z") == set()
 
-    assert cycle_neighborhood("F", 1) == {
+    assert cycle_neighborhood(
+        "F",
+        1,
+    ) == {
         "c2", "c3", "c4", "c5"
     }
 
-    assert cycle_neighborhood("Y", 1) == {
+    assert cycle_neighborhood(
+        "Y",
+        1,
+    ) == {
         "c1", "c3", "c4"
     }
 
-    assert cycle_neighborhood("R", 1) == {
+    assert cycle_neighborhood(
+        "R",
+        1,
+    ) == {
         "c2", "c5"
     }
 
-    assert cycle_neighborhood("Y", 5) == {
+    assert cycle_neighborhood(
+        "Y",
+        5,
+    ) == {
         "c2", "c3", "c5"
     }
 
@@ -407,23 +886,50 @@ def run_internal_tests():
         "110",
         ["f", "a", "g"],
     ) == {
-        "c2", "c4", "c5", "f", "a"
+        "c2", "c4", "c5",
+        "f", "a",
     }
 
     path = make_graph(
-        vertices=[0, 1, 2],
-        edges=[(0, 1), (1, 2)],
+        vertices=[
+            0, 1, 2
+        ],
+        edges=[
+            (0, 1),
+            (1, 2),
+        ],
     )
 
     triangle = make_graph(
-        vertices=[0, 1, 2],
-        edges=[(0, 1), (1, 2), (2, 0)],
+        vertices=[
+            0, 1, 2
+        ],
+        edges=[
+            (0, 1),
+            (1, 2),
+            (2, 0),
+        ],
     )
 
-    assert is_independent(path, {0, 2})
-    assert not is_independent(path, {0, 1})
-    assert is_triangle_free(path, {0, 1, 2})
-    assert not is_triangle_free(triangle, {0, 1, 2})
+    assert is_independent(
+        path,
+        {0, 2},
+    )
+
+    assert not is_independent(
+        path,
+        {0, 1},
+    )
+
+    assert is_triangle_free(
+        path,
+        {0, 1, 2},
+    )
+
+    assert not is_triangle_free(
+        triangle,
+        {0, 1, 2},
+    )
 
     assert not one_vertex_admissible(
         triangle,
@@ -431,8 +937,12 @@ def run_internal_tests():
     )
 
     edge_and_isolated = make_graph(
-        vertices=[0, 1, 2],
-        edges=[(0, 1)],
+        vertices=[
+            0, 1, 2
+        ],
+        edges=[
+            (0, 1),
+        ],
     )
 
     assert not one_vertex_admissible(
@@ -441,7 +951,9 @@ def run_internal_tests():
     )
 
     cycle5 = make_graph(
-        vertices=[0, 1, 2, 3, 4],
+        vertices=[
+            0, 1, 2, 3, 4
+        ],
         edges=[
             (0, 1),
             (1, 2),
@@ -457,8 +969,12 @@ def run_internal_tests():
     )
 
     single_edge = make_graph(
-        vertices=[0, 1],
-        edges=[(0, 1)],
+        vertices=[
+            0, 1
+        ],
+        edges=[
+            (0, 1),
+        ],
     )
 
     assert nonedge_permitted(
@@ -468,7 +984,9 @@ def run_internal_tests():
     )
 
     two_isolated = make_graph(
-        vertices=[0, 1],
+        vertices=[
+            0, 1
+        ],
         edges=[],
     )
 
@@ -492,20 +1010,54 @@ def run_internal_tests():
 
 
 def main():
-    print("Recolorability of (2K_2, K_4)-Free Graphs")
-    print("Finite certificate verifier")
+    print(
+        "Recolorability of "
+        "(2K_2, K_4)-Free Graphs"
+    )
+
+    print(
+        "Finite certificate verifier"
+    )
+
     print()
 
     run_internal_tests()
-    print("Internal tests passed.")
+
+    print(
+        "Internal tests passed."
+    )
 
     for certificate in CERTIFICATES:
-        number_of_profiles = verify_certificate(certificate)
 
-        print(
-            f"{certificate['name']}: "
-            f"{number_of_profiles} admissible profiles verified."
+        number_of_profiles, number_of_survivors = (
+            verify_certificate(
+                certificate
+            )
         )
+
+        if certificate.get(
+            "elimination_rounds"
+        ):
+
+            number_eliminated = (
+                number_of_profiles
+                - number_of_survivors
+            )
+
+            print(
+                f"{certificate['name']}: "
+                f"{number_of_profiles} admissible profiles; "
+                f"{number_eliminated} eliminated; "
+                f"{number_of_survivors} survive."
+            )
+
+        else:
+
+            print(
+                f"{certificate['name']}: "
+                f"{number_of_profiles} "
+                f"admissible profiles verified."
+            )
 
 
 if __name__ == "__main__":
