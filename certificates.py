@@ -154,7 +154,9 @@ A1 = {
     #   core_le_profile:
     #       N_K(h) is contained in N_K(v).
     #
-    # Rows in the same round are eliminated simultaneously.
+    # The expected_rescuers field records the complete list of
+    # profiles that can rescue the comparison at the beginning
+    # of that elimination round.
 
     "elimination_rounds": [
         [
@@ -162,21 +164,27 @@ A1 = {
                 "profile": "Z[000]",
                 "direction": "profile_le_core",
                 "core_vertex": "c1",
+                "expected_rescuers": [],
             },
             {
                 "profile": "R4[000]",
                 "direction": "profile_le_core",
                 "core_vertex": "f",
+                "expected_rescuers": [],
             },
             {
                 "profile": "R4[111]",
                 "direction": "core_le_profile",
                 "core_vertex": "c4",
+                "expected_rescuers": [],
             },
             {
                 "profile": "Y3[110]",
                 "direction": "core_le_profile",
                 "core_vertex": "c2",
+                "expected_rescuers": [
+                    "R1[111]",
+                ],
             },
         ],
 
@@ -185,6 +193,7 @@ A1 = {
                 "profile": "R5[111]",
                 "direction": "core_le_profile",
                 "core_vertex": "c5",
+                "expected_rescuers": [],
             },
         ],
     ],
@@ -193,8 +202,8 @@ A1 = {
     #
     #     c2 <=_K Y3[110]
     #
-    # is a vertex of profile R1[111], joined to the first vertex
-    # by a nonedge.  The resulting ten vertices induce B10.
+    # has profile R1[111] and must be nonadjacent to the
+    # Y3[110]-vertex. The resulting extension induces B10.
 
     "obstruction_relations": [
         {
