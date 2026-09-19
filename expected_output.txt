@@ -2,6 +2,7 @@ Yes, (2K_2, K_4)-free graphs are recolorable
 Finite certificate verifier
 
 Internal tests passed.
+Appendix C: obstruction witnesses C.1--C.36 verified.
 K0: 23 admissible profiles verified.
 B.1: 16 admissible profiles; 12 eliminated; 4 survive.
 B.2: 17 admissible profiles; 9 eliminated; 8 survive.
