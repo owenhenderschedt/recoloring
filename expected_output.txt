@@ -16,5 +16,12 @@ B.10: 22 admissible profiles; 5 eliminated; 17 survive.
 B.11: 18 admissible profiles; 18 eliminated; 0 survive.
 B.12: 21 admissible profiles; 6 eliminated; 15 survive.
 B.13: 17 admissible profiles; 17 eliminated; 0 survive.
+B.14: 12 admissible profiles; 10 eliminated; 2 survive.
+B.15: 20 admissible profiles; 8 eliminated; 12 survive.
+B.16: 20 admissible profiles; 5 eliminated; 15 survive.
+B.17: 18 admissible profiles; 1 directly excluded; 17 eliminated; 0 survive.
+B.18: 21 admissible profiles; 3 eliminated; 18 survive.
+B.19: 20 admissible profiles; 9 eliminated; 11 survive.
+B.20: 19 admissible profiles; 2 directly excluded; 17 eliminated; 0 survive.
 B10: 21 admissible profiles; 15 eliminated; 6 survive. Relation table verified.
 B11: 16 admissible profiles; 4 directly excluded; 12 eliminated; 0 survive.
