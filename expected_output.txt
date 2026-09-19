@@ -3,3 +3,4 @@ Finite certificate verifier
 
 Basic graph tests passed.
 One-vertex attachment tests passed.
+Two-vertex attachment tests passed.
