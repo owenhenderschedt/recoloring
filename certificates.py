@@ -9,22 +9,59 @@ It contains data only; the verification logic is in verify.py.
 
 
 # ---------------------------------------------------------------------
+# Definition of B10
+#
+# Ordered vertices:
+#
+#     (c1, c2, c3, c4, c5, f, a, g, y, r)
+#
+# with
+#
+#     f in F1,
+#     a in Y1,
+#     g in F2,
+#     y in Y3, adjacent to f and a,
+#     r in R1, adjacent to f, a, and g.
+# ---------------------------------------------------------------------
+
+B10 = {
+    "name": "B10",
+
+    "ordered_vertices": [
+        "c1", "c2", "c3", "c4", "c5",
+        "f", "a", "g", "y", "r",
+    ],
+
+    "construction": [
+        ("f", "F", 1, []),
+        ("a", "Y", 1, []),
+        ("g", "F", 2, []),
+        ("y", "Y", 3, ["f", "a"]),
+        ("r", "R", 1, ["f", "a", "g"]),
+    ],
+}
+
+
+OBSTRUCTIONS = {
+    "B10": B10,
+}
+
+
+# ---------------------------------------------------------------------
 # Worked example K0
 # ---------------------------------------------------------------------
 
 K0 = {
     "name": "K0",
     "description": "worked example",
+
     "off_cycle_order": ["f", "a"],
 
-    # Each tuple is
-    # (vertex, cycle type, index, earlier off-cycle neighbors).
     "construction": [
         ("f", "F", 1, []),
         ("a", "Y", 1, []),
     ],
 
-    # No additional branch restrictions are imposed in this example.
     "excluded_cycle_types": [],
 
     "admissible_profiles": [
@@ -58,19 +95,19 @@ K0 = {
 # ---------------------------------------------------------------------
 # Table A.1: overlap
 #
-# Current indexing:
+# Core:
 #
-#     f in F_1,
-#     a in Y_1, nonadjacent to f,
-#     g in F_2, nonadjacent to f and a.
+#     f in F1,
+#     a in Y1, nonadjacent to f,
+#     g in F2, nonadjacent to f and a.
 #
-# The normalized assumptions give U = empty and F_1 = {f}.
-# Thus no U-profile and no additional F_1-profile is permitted.
+# Normalization gives U = empty and F1 = {f}.
 # ---------------------------------------------------------------------
 
 A1 = {
     "name": "A.1",
     "description": "overlap",
+
     "off_cycle_order": ["f", "a", "g"],
 
     "construction": [
@@ -107,6 +144,95 @@ A1 = {
         "R5[100]",
         "R5[101]",
         "R5[111]",
+    ],
+
+    # Each comparison has one of the following forms:
+    #
+    #   profile_le_core:
+    #       N_K(v) is contained in N_K(h).
+    #
+    #   core_le_profile:
+    #       N_K(h) is contained in N_K(v).
+    #
+    # Rows in the same round are eliminated simultaneously.
+
+    "elimination_rounds": [
+        [
+            {
+                "profile": "Z[000]",
+                "direction": "profile_le_core",
+                "core_vertex": "c1",
+            },
+            {
+                "profile": "R4[000]",
+                "direction": "profile_le_core",
+                "core_vertex": "f",
+            },
+            {
+                "profile": "R4[111]",
+                "direction": "core_le_profile",
+                "core_vertex": "c4",
+            },
+            {
+                "profile": "Y3[110]",
+                "direction": "core_le_profile",
+                "core_vertex": "c2",
+            },
+        ],
+
+        [
+            {
+                "profile": "R5[111]",
+                "direction": "core_le_profile",
+                "core_vertex": "c5",
+            },
+        ],
+    ],
+
+    # The only formally possible rescuer of
+    #
+    #     c2 <=_K Y3[110]
+    #
+    # is a vertex of profile R1[111], joined to the first vertex
+    # by a nonedge.  The resulting ten vertices induce B10.
+
+    "obstruction_relations": [
+        {
+            "sigma": "Y3[110]",
+            "tau": "R1[111]",
+            "relation": "nonedge",
+            "obstruction": "B10",
+
+            # These vertices correspond, in order, to
+            #
+            # (c1,c2,c3,c4,c5,f,a,g,y,r)
+            #
+            # in the defining copy of B10.
+            "witness": [
+                "c1", "c2", "c3", "c4", "c5",
+                "f", "a", "g", "v", "w",
+            ],
+        },
+    ],
+
+    "surviving_profiles": [
+        "Y1[000]",
+        "F2[000]",
+        "R2[100]",
+        "R5[100]",
+        "Y3[100]",
+        "Y2[010]",
+        "R3[001]",
+        "R2[101]",
+        "R5[101]",
+        "Y4[101]",
+        "R1[011]",
+        "Y5[011]",
+        "Z[111]",
+        "R2[111]",
+        "R3[111]",
+        "Y4[111]",
+        "R1[111]",
     ],
 }
 
