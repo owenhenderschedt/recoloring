@@ -438,6 +438,525 @@ OBSTRUCTIONS = {
 
 
 # ---------------------------------------------------------------------
+# Certificates B.1--B.4: the U-branch of Claim 9
+#
+# In this branch U = {u}, F1 = {f}, and Y1 is empty.  Claim 8 also
+# gives that u is complete to every R_i and to Z.  Thus an outside
+# R- or Z-vertex must have u-bit 1.  These are branch assumptions
+# proved in the manuscript before the certificates are used.
+# ---------------------------------------------------------------------
+
+U_BRANCH_REQUIRED_BITS = [
+    {
+        "kinds": ["R", "Z"],
+        "position": 1,
+        "value": "1",
+    },
+]
+
+
+# ---------------------------------------------------------------------
+# Certificate B.1
+# ---------------------------------------------------------------------
+
+CERT_B1 = {
+    "name": "B.1",
+    "description": "Claim 9, Case 1",
+
+    "off_cycle_order": ["f", "u", "y", "yp"],
+
+    "construction": [
+        ("f", "F", 1, []),
+        ("u", "U", None, []),
+        ("y", "Y", 3, ["f"]),
+        ("yp", "Y", 4, ["f", "y"]),
+    ],
+
+    "excluded_cycle_types": [
+        ("U", None),
+        ("F", 1),
+        ("Y", 1),
+    ],
+
+    "required_bits": U_BRANCH_REQUIRED_BITS,
+
+    "admissible_profiles": [
+        "Z[0111]",
+        "Z[1101]",
+        "Z[1110]",
+        "F2[0001]",
+        "F5[0010]",
+        "Y2[0010]",
+        "Y3[1001]",
+        "Y4[1010]",
+        "Y5[0001]",
+        "R1[0111]",
+        "R2[1101]",
+        "R3[0111]",
+        "R3[1110]",
+        "R4[0111]",
+        "R4[1101]",
+        "R5[1110]",
+    ],
+
+    "elimination_rounds": [
+        [
+            {
+                "profile": "Y2[0010]",
+                "direction": "profile_le_core",
+                "core_vertex": "f",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Y3[1001]",
+                "direction": "core_le_profile",
+                "core_vertex": "y",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Y4[1010]",
+                "direction": "core_le_profile",
+                "core_vertex": "yp",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Z[1101]",
+                "direction": "profile_le_core",
+                "core_vertex": "c4",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Z[1110]",
+                "direction": "profile_le_core",
+                "core_vertex": "c3",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R2[1101]",
+                "direction": "profile_le_core",
+                "core_vertex": "c2",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R5[1110]",
+                "direction": "profile_le_core",
+                "core_vertex": "c5",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R4[1101]",
+                "direction": "core_le_profile",
+                "core_vertex": "c4",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R3[1110]",
+                "direction": "core_le_profile",
+                "core_vertex": "c3",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Z[0111]",
+                "direction": "profile_le_core",
+                "core_vertex": "c1",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Y5[0001]",
+                "direction": "profile_le_core",
+                "core_vertex": "f",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R1[0111]",
+                "direction": "core_le_profile",
+                "core_vertex": "c1",
+                "expected_rescuers": [],
+            },
+        ],
+    ],
+
+    "surviving_profiles": [
+        "F5[0010]",
+        "F2[0001]",
+        "R3[0111]",
+        "R4[0111]",
+    ],
+}
+
+
+# ---------------------------------------------------------------------
+# Certificate B.2
+# ---------------------------------------------------------------------
+
+CERT_B2 = {
+    "name": "B.2",
+    "description": "Claim 9, Case 2",
+
+    "off_cycle_order": ["f", "u", "y"],
+
+    "construction": [
+        ("f", "F", 1, []),
+        ("u", "U", None, []),
+        ("y", "Y", 3, ["f"]),
+    ],
+
+    "excluded_cycle_types": [
+        ("U", None),
+        ("F", 1),
+        ("Y", 1),
+        ("Y", 4),
+    ],
+
+    "required_bits": U_BRANCH_REQUIRED_BITS,
+
+    "admissible_profiles": [
+        "Z[011]",
+        "Z[110]",
+        "Z[111]",
+        "F2[000]",
+        "F5[001]",
+        "Y2[001]",
+        "Y3[100]",
+        "Y5[000]",
+        "R1[011]",
+        "R1[110]",
+        "R2[110]",
+        "R3[011]",
+        "R3[111]",
+        "R4[011]",
+        "R4[110]",
+        "R5[110]",
+        "R5[111]",
+    ],
+
+    "elimination_rounds": [
+        [
+            {
+                "profile": "Y5[000]",
+                "direction": "profile_le_core",
+                "core_vertex": "u",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R1[011]",
+                "direction": "core_le_profile",
+                "core_vertex": "c1",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "F2[000]",
+                "direction": "profile_le_core",
+                "core_vertex": "u",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R5[111]",
+                "direction": "profile_le_core",
+                "core_vertex": "c5",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R4[110]",
+                "direction": "core_le_profile",
+                "core_vertex": "c4",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Z[011]",
+                "direction": "profile_le_core",
+                "core_vertex": "c1",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R3[011]",
+                "direction": "profile_le_core",
+                "core_vertex": "c3",
+                "expected_rescuers": [],
+            },
+        ],
+        [
+            {
+                "profile": "R2[110]",
+                "direction": "core_le_profile",
+                "core_vertex": "c2",
+                "expected_rescuers": ["Y5[000]"],
+            },
+            {
+                "profile": "R3[111]",
+                "direction": "core_le_profile",
+                "core_vertex": "c3",
+                "expected_rescuers": ["Y5[000]"],
+            },
+        ],
+    ],
+
+    "surviving_profiles": [
+        "Y3[100]",
+        "Z[110]",
+        "R5[110]",
+        "R1[110]",
+        "F5[001]",
+        "Y2[001]",
+        "R4[011]",
+        "Z[111]",
+    ],
+}
+
+
+# ---------------------------------------------------------------------
+# Certificate B.3
+# ---------------------------------------------------------------------
+
+CERT_B3 = {
+    "name": "B.3",
+    "description": "Claim 9, Case 2 with r in R1[110]",
+
+    "off_cycle_order": ["f", "u", "y", "r"],
+
+    "construction": [
+        ("f", "F", 1, []),
+        ("u", "U", None, []),
+        ("y", "Y", 3, ["f"]),
+        ("r", "R", 1, ["f", "u"]),
+    ],
+
+    "excluded_cycle_types": [
+        ("U", None),
+        ("F", 1),
+        ("Y", 1),
+        ("Y", 4),
+    ],
+
+    "required_bits": U_BRANCH_REQUIRED_BITS,
+
+    "admissible_profiles": [
+        "Z[1100]",
+        "F2[0001]",
+        "F5[0011]",
+        "Y2[0011]",
+        "Y3[1000]",
+        "Y5[0000]",
+        "R1[0110]",
+        "R1[1100]",
+        "R2[1101]",
+        "R3[0110]",
+        "R3[1110]",
+        "R4[1100]",
+        "R5[1111]",
+    ],
+
+    "elimination_rounds": [
+        [
+            {
+                "profile": "Y5[0000]",
+                "direction": "profile_le_core",
+                "core_vertex": "f",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R1[0110]",
+                "direction": "core_le_profile",
+                "core_vertex": "c1",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Y3[1000]",
+                "direction": "core_le_profile",
+                "core_vertex": "y",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "F2[0001]",
+                "direction": "profile_le_core",
+                "core_vertex": "u",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Z[1100]",
+                "direction": "profile_le_core",
+                "core_vertex": "c4",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Y2[0011]",
+                "direction": "profile_le_core",
+                "core_vertex": "f",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R1[1100]",
+                "direction": "core_le_profile",
+                "core_vertex": "r",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R5[1111]",
+                "direction": "profile_le_core",
+                "core_vertex": "c5",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R4[1100]",
+                "direction": "core_le_profile",
+                "core_vertex": "c4",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R3[0110]",
+                "direction": "profile_le_core",
+                "core_vertex": "c3",
+                "expected_rescuers": [],
+            },
+        ],
+        [
+            {
+                "profile": "R3[1110]",
+                "direction": "core_le_profile",
+                "core_vertex": "c3",
+                "expected_rescuers": ["Y5[0000]"],
+            },
+            {
+                "profile": "R2[1101]",
+                "direction": "core_le_profile",
+                "core_vertex": "c2",
+                "expected_rescuers": ["Y5[0000]"],
+            },
+        ],
+    ],
+
+    "surviving_profiles": [
+        "F5[0011]",
+    ],
+}
+
+
+# ---------------------------------------------------------------------
+# Certificate B.4
+# ---------------------------------------------------------------------
+
+CERT_B4 = {
+    "name": "B.4",
+    "description": "Claim 9, Case 2 with g' in F5[001]",
+
+    "off_cycle_order": ["f", "u", "y", "gp"],
+
+    "construction": [
+        ("f", "F", 1, []),
+        ("u", "U", None, []),
+        ("y", "Y", 3, ["f"]),
+        ("gp", "F", 5, ["y"]),
+    ],
+
+    "excluded_cycle_types": [
+        ("U", None),
+        ("F", 1),
+        ("Y", 1),
+        ("Y", 4),
+        ("R", 1),
+    ],
+
+    "required_bits": U_BRANCH_REQUIRED_BITS,
+
+    "admissible_profiles": [
+        "Z[0110]",
+        "Z[1101]",
+        "Z[1111]",
+        "F5[0010]",
+        "Y2[0011]",
+        "Y3[1001]",
+        "Y5[0000]",
+        "R2[1101]",
+        "R3[0110]",
+        "R3[1111]",
+        "R4[1101]",
+        "R5[1101]",
+        "R5[1110]",
+    ],
+
+    "elimination_rounds": [
+        [
+            {
+                "profile": "Y5[0000]",
+                "direction": "profile_le_core",
+                "core_vertex": "f",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R4[1101]",
+                "direction": "core_le_profile",
+                "core_vertex": "c4",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "F5[0010]",
+                "direction": "core_le_profile",
+                "core_vertex": "gp",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Z[1111]",
+                "direction": "profile_le_core",
+                "core_vertex": "c3",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Z[0110]",
+                "direction": "profile_le_core",
+                "core_vertex": "c1",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R3[1111]",
+                "direction": "core_le_profile",
+                "core_vertex": "c3",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R3[0110]",
+                "direction": "profile_le_core",
+                "core_vertex": "c3",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R5[1110]",
+                "direction": "core_le_profile",
+                "core_vertex": "c5",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R2[1101]",
+                "direction": "core_le_profile",
+                "core_vertex": "c2",
+                "expected_rescuers": [],
+            },
+        ],
+        [
+            {
+                "profile": "Y3[1001]",
+                "direction": "core_le_profile",
+                "core_vertex": "y",
+                "expected_rescuers": ["Z[1111]"],
+            },
+        ],
+        [
+            {
+                "profile": "Z[1101]",
+                "direction": "profile_le_core",
+                "core_vertex": "c2",
+                "expected_rescuers": ["Y3[1001]"],
+            },
+        ],
+    ],
+
+    "surviving_profiles": [
+        "R5[1101]",
+        "Y2[0011]",
+    ],
+}
+
+
+# ---------------------------------------------------------------------
 # Certificate B.5
 #
 # Core K = (C; f, a, g) with
@@ -449,7 +968,7 @@ OBSTRUCTIONS = {
 # This is the core used in Claim 10 of the main theorem.
 # ---------------------------------------------------------------------
 
-B5 = {
+CERT_B5 = {
     "name": "B.5",
     "description": "Claim 10 core",
 
@@ -568,7 +1087,11 @@ B5 = {
 
 CERTIFICATES = [
     K0,
-    B5,
+    CERT_B1,
+    CERT_B2,
+    CERT_B3,
+    CERT_B4,
+    CERT_B5,
     B10,
     B11,
 ]
