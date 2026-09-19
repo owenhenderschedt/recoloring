@@ -3,3 +3,4 @@ Finite certificate verifier
 
 Internal tests passed.
 K0: 23 admissible profiles verified.
+A.1: 22 admissible profiles verified.
