@@ -1,7 +1,7 @@
 """
 Finite verification for the paper
 
-    Recolorability of (2K_2, K_4)-Free Graphs.
+    Yes, (2K_2, K_4)-free graphs are recolorable.
 
 The program verifies the attachment-profile calculations used in the
 computer-assisted portions of the proof.
@@ -16,21 +16,18 @@ from certificates import CERTIFICATES, OBSTRUCTIONS
 
 class VerificationError(Exception):
     """Raised when a finite certificate fails verification."""
-    pass
+
 
 
 def check(condition, message):
-    """
-    Raise an informative verification error when condition is false.
-    """
+    """Raise an informative verification error when condition is false."""
     if not condition:
         raise VerificationError(message)
 
 
+
 def make_graph(vertices, edges):
-    """
-    Return the adjacency dictionary of a finite simple graph.
-    """
+    """Return the adjacency dictionary of a finite simple graph."""
     G = {v: set() for v in vertices}
 
     for u, v in edges:
@@ -43,6 +40,7 @@ def make_graph(vertices, edges):
     return G
 
 
+
 def copy_graph(G):
     """Return a copy of G."""
     return {
@@ -51,12 +49,9 @@ def copy_graph(G):
     }
 
 
-def add_vertex(G, vertex, neighbors):
-    """
-    Add a new vertex with the specified neighborhood.
 
-    The function modifies G in place.
-    """
+def add_vertex(G, vertex, neighbors):
+    """Add a new vertex with the specified neighborhood."""
     assert vertex not in G
 
     neighbors = set(neighbors)
@@ -69,6 +64,7 @@ def add_vertex(G, vertex, neighbors):
         G[u].add(vertex)
 
 
+
 def add_edge(G, u, v):
     """Add the edge uv to G."""
     assert u in G and v in G
@@ -78,11 +74,9 @@ def add_edge(G, u, v):
     G[v].add(u)
 
 
+
 def is_independent(G, vertices):
-    """
-    Return True exactly when the given vertices induce
-    an independent set.
-    """
+    """Return True exactly when the given vertices induce an independent set."""
     S = set(vertices)
 
     for u in S:
@@ -92,10 +86,9 @@ def is_independent(G, vertices):
     return True
 
 
+
 def is_triangle_free(G, vertices):
-    """
-    Return True exactly when the given vertices induce no triangle.
-    """
+    """Return True exactly when the given vertices induce no triangle."""
     S = set(vertices)
 
     for u in S:
@@ -106,11 +99,9 @@ def is_triangle_free(G, vertices):
     return True
 
 
+
 def is_complete_between(G, A, B):
-    """
-    Return True exactly when every vertex of A is adjacent
-    to every vertex of B.
-    """
+    """Return True exactly when every vertex of A is adjacent to every vertex of B."""
     A = set(A)
     B = set(B)
 
@@ -119,6 +110,7 @@ def is_complete_between(G, A, B):
             return False
 
     return True
+
 
 
 def edge_count(G, vertices):
@@ -131,11 +123,9 @@ def edge_count(G, vertices):
     ) // 2
 
 
+
 def is_2k2_k4_free(G):
-    """
-    Return True exactly when G contains neither an induced 2K_2
-    nor a K_4.
-    """
+    """Return True exactly when G contains neither an induced 2K_2 nor a K_4."""
     for four_vertices in combinations(G, 4):
         S = set(four_vertices)
         number_of_edges = edge_count(G, S)
@@ -153,6 +143,7 @@ def is_2k2_k4_free(G):
             return False
 
     return True
+
 
 
 def one_vertex_admissible(G, S):
@@ -184,6 +175,7 @@ def one_vertex_admissible(G, S):
     return True
 
 
+
 def nonedge_permitted(G, S, T):
     """
     Test whether two individually admissible new vertices x and y,
@@ -203,6 +195,7 @@ def nonedge_permitted(G, S, T):
     )
 
 
+
 def edge_permitted(G, S, T):
     """
     Test whether two individually admissible new vertices x and y,
@@ -217,18 +210,42 @@ def edge_permitted(G, S, T):
 
     return (
         is_independent(G, S & T)
-        and
-        is_independent(G, V - (S | T))
+        and is_independent(G, V - (S | T))
     )
 
 
+
+def relation_symbol(G, S, T):
+    """
+    Return the two-profile relation symbol used in the manuscript.
+
+    0  : only a nonedge is permitted;
+    1  : only an edge is permitted;
+    *  : both are permitted;
+    x  : neither is permitted.
+    """
+    edge = edge_permitted(G, S, T)
+    nonedge = nonedge_permitted(G, S, T)
+
+    if edge and nonedge:
+        return "*"
+
+    if edge:
+        return "1"
+
+    if nonedge:
+        return "0"
+
+    return "x"
+
+
+
 def cycle_vertex(i):
-    """
-    Return c_i, with indices interpreted modulo 5.
-    """
+    """Return c_i, with indices interpreted modulo 5."""
     i = ((i - 1) % 5) + 1
 
     return f"c{i}"
+
 
 
 def cycle_neighborhood(kind, i=None):
@@ -270,6 +287,9 @@ def cycle_neighborhood(kind, i=None):
             cycle_vertex(i + 1),
         }
 
+    raise AssertionError("unreachable")
+
+
 
 def profile_neighborhood(
     kind,
@@ -277,10 +297,7 @@ def profile_neighborhood(
     bits,
     off_cycle_order,
 ):
-    """
-    Return the neighborhood in the core prescribed by
-    an attachment profile.
-    """
+    """Return the neighborhood in the core prescribed by an attachment profile."""
     assert len(bits) == len(off_cycle_order)
     assert all(
         bit in {"0", "1"}
@@ -299,10 +316,9 @@ def profile_neighborhood(
     return S
 
 
+
 def fixed_cycle():
-    """
-    Return the fixed induced cycle c1 c2 c3 c4 c5 c1.
-    """
+    """Return the fixed induced cycle c1 c2 c3 c4 c5 c1."""
     vertices = [
         cycle_vertex(i)
         for i in range(1, 6)
@@ -322,6 +338,7 @@ def fixed_cycle():
     )
 
 
+
 def add_typed_vertex(
     G,
     vertex,
@@ -329,9 +346,7 @@ def add_typed_vertex(
     i=None,
     earlier_neighbors=(),
 ):
-    """
-    Add an off-cycle vertex of a specified cycle type.
-    """
+    """Add an off-cycle vertex of a specified cycle type."""
     neighborhood = (
         cycle_neighborhood(kind, i)
         | set(earlier_neighbors)
@@ -344,10 +359,9 @@ def add_typed_vertex(
     )
 
 
+
 def build_core(certificate):
-    """
-    Construct the core specified by a certificate.
-    """
+    """Construct the core specified by a certificate."""
     G = fixed_cycle()
 
     for (
@@ -368,10 +382,9 @@ def build_core(certificate):
     return G
 
 
+
 def all_cycle_types():
-    """
-    Iterate through U, Z, and all F_i, Y_i, R_i cycle types.
-    """
+    """Iterate through U, Z, and all F_i, Y_i, R_i cycle types."""
     yield "U", None
     yield "Z", None
 
@@ -380,10 +393,9 @@ def all_cycle_types():
             yield kind, i
 
 
+
 def profile_label(kind, i, bits):
-    """
-    Return the paper-style label of an attachment profile.
-    """
+    """Return the paper-style label of an attachment profile."""
     if i is None:
         cycle_type = kind
     else:
@@ -392,14 +404,13 @@ def profile_label(kind, i, bits):
     return f"{cycle_type}[{bits}]"
 
 
+
 def admissible_profile_neighborhoods(
     G,
     off_cycle_order,
     excluded_cycle_types=(),
 ):
-    """
-    Return the admissible profiles and their core neighborhoods.
-    """
+    """Return the admissible profiles and their core neighborhoods."""
     excluded_cycle_types = set(
         excluded_cycle_types
     )
@@ -436,6 +447,7 @@ def admissible_profile_neighborhoods(
     return profiles
 
 
+
 def same_ordered_graph(
     G,
     ordered_vertices_G,
@@ -443,13 +455,12 @@ def same_ordered_graph(
     ordered_vertices_H,
 ):
     """
-    Test whether the indicated ordered vertex sets have
-    identical adjacency matrices.
+    Test whether the indicated ordered vertex sets have identical
+    adjacency matrices.
     """
     assert (
         len(ordered_vertices_G)
-        ==
-        len(ordered_vertices_H)
+        == len(ordered_vertices_H)
     )
 
     n = len(ordered_vertices_G)
@@ -470,6 +481,7 @@ def same_ordered_graph(
                 return False
 
     return True
+
 
 
 def build_two_profile_extension(
@@ -517,19 +529,18 @@ def build_two_profile_extension(
     return H
 
 
+
 def verify_local_comparison(
     G,
-    profile_neighborhood,
+    profile_neighborhood_set,
     direction,
     core_vertex,
     certificate_name,
     profile,
     round_number,
 ):
-    """
-    Verify the local comparison displayed in an elimination row.
-    """
-    S = set(profile_neighborhood)
+    """Verify the local comparison displayed in an elimination row."""
+    S = set(profile_neighborhood_set)
 
     check(
         core_vertex in G,
@@ -570,16 +581,13 @@ def verify_local_comparison(
 
     else:
         raise VerificationError(
-            f"{certificate_name}: unknown comparison direction "
-            f"{direction}."
+            f"{certificate_name}: unknown comparison direction {direction}."
         )
 
 
+
 def rescue_relation(direction):
-    """
-    Return the relation required between the eliminated profile
-    and a rescuer.
-    """
+    """Return the relation required between the eliminated profile and a rescuer."""
     if direction == "profile_le_core":
         return "edge"
 
@@ -591,22 +599,24 @@ def rescue_relation(direction):
     )
 
 
+
 def possible_rescuers(
     G,
     profile_map,
     sigma,
     direction,
     core_vertex,
-    available_profiles,
+    candidate_profiles,
 ):
     """
-    Return every available profile that can rescue the displayed
-    local comparison before obstruction exclusions are imposed.
+    Return every candidate profile that can rescue the displayed local
+    comparison before previous-round eliminations or obstruction exclusions
+    are imposed.
     """
     S = profile_map[sigma]
     rescuers = []
 
-    for tau in available_profiles:
+    for tau in candidate_profiles:
         T = profile_map[tau]
 
         if direction == "profile_le_core":
@@ -633,6 +643,7 @@ def possible_rescuers(
     return rescuers
 
 
+
 def obstruction_forbids_relation(
     certificate,
     sigma,
@@ -640,8 +651,8 @@ def obstruction_forbids_relation(
     relation,
 ):
     """
-    Return True exactly when the certificate records that this
-    relation between sigma and tau creates a forbidden obstruction.
+    Return True exactly when the certificate records that this relation
+    between sigma and tau creates a forbidden obstruction.
     """
     for obstruction in certificate.get(
         "obstruction_relations",
@@ -669,15 +680,13 @@ def obstruction_forbids_relation(
     return False
 
 
+
 def verify_obstruction_relations(
     G,
     profile_map,
     certificate,
 ):
-    """
-    Verify every explicit obstruction relation recorded
-    for the certificate.
-    """
+    """Verify every explicit obstruction relation recorded for a certificate."""
     name = certificate["name"]
 
     for data in certificate.get(
@@ -688,15 +697,16 @@ def verify_obstruction_relations(
         sigma = data["sigma"]
         tau = data["tau"]
         relation = data["relation"]
+        label = data.get("label", "obstruction")
 
         check(
             sigma in profile_map,
-            f"{name}: obstruction profile {sigma} is not admissible.",
+            f"{name}, {label}: obstruction profile {sigma} is not admissible.",
         )
 
         check(
             tau in profile_map,
-            f"{name}: obstruction profile {tau} is not admissible.",
+            f"{name}, {label}: obstruction profile {tau} is not admissible.",
         )
 
         S = profile_map[sigma]
@@ -707,7 +717,7 @@ def verify_obstruction_relations(
             check(
                 edge_permitted(G, S, T),
                 (
-                    f"{name}: the stated edge between "
+                    f"{name}, {label}: the stated edge between "
                     f"{sigma} and {tau} is not permitted."
                 ),
             )
@@ -717,14 +727,14 @@ def verify_obstruction_relations(
             check(
                 nonedge_permitted(G, S, T),
                 (
-                    f"{name}: the stated nonedge between "
+                    f"{name}, {label}: the stated nonedge between "
                     f"{sigma} and {tau} is not permitted."
                 ),
             )
 
         else:
             raise VerificationError(
-                f"{name}: unknown relation {relation}."
+                f"{name}, {label}: unknown relation {relation}."
             )
 
         extension = build_two_profile_extension(
@@ -734,23 +744,19 @@ def verify_obstruction_relations(
             relation,
         )
 
-        obstruction_name = data[
-            "obstruction"
-        ]
+        obstruction_name = data["obstruction"]
 
         check(
             obstruction_name in OBSTRUCTIONS,
             (
-                f"{name}: unknown obstruction "
+                f"{name}, {label}: unknown obstruction "
                 f"{obstruction_name}."
             ),
         )
 
-        obstruction_definition = (
-            OBSTRUCTIONS[
-                obstruction_name
-            ]
-        )
+        obstruction_definition = OBSTRUCTIONS[
+            obstruction_name
+        ]
 
         obstruction_graph = build_core(
             obstruction_definition
@@ -766,10 +772,11 @@ def verify_obstruction_relations(
                 ],
             ),
             (
-                f"{name}: the stated {obstruction_name} witness for "
+                f"{name}, {label}: the stated {obstruction_name} witness for "
                 f"{sigma}, {tau} with relation {relation} is incorrect."
             ),
         )
+
 
 
 def verify_elimination_rounds(
@@ -780,9 +787,15 @@ def verify_elimination_rounds(
     """
     Verify the elimination rounds of a finite certificate.
 
+    The expected_rescuers field records every admissible profile that can
+    rescue the comparison before round eliminations are taken into account.
+    A row is valid when every such rescuer is either unavailable because it
+    was removed in an earlier round or is blocked by a verified obstruction.
+
     Profiles in one round are removed simultaneously.
     """
     name = certificate["name"]
+    all_profiles = list(profile_map)
     available = list(profile_map)
 
     rounds = certificate.get(
@@ -827,7 +840,7 @@ def verify_elimination_rounds(
                 sigma,
                 direction,
                 core_vertex,
-                available,
+                all_profiles,
             )
 
             expected_rescuers = row[
@@ -848,9 +861,15 @@ def verify_elimination_rounds(
                 direction
             )
 
-            remaining_rescuers = [
+            available_rescuers = [
                 tau
                 for tau in raw_rescuers
+                if tau in available
+            ]
+
+            remaining_rescuers = [
+                tau
+                for tau in available_rescuers
                 if not obstruction_forbids_relation(
                     certificate,
                     sigma,
@@ -863,8 +882,8 @@ def verify_elimination_rounds(
                 remaining_rescuers == [],
                 (
                     f"{name}, round {round_number}, {sigma}: "
-                    "the following rescuers remain legal after "
-                    f"obstruction checks: {remaining_rescuers}"
+                    "the following rescuers remain legal after previous-round "
+                    f"eliminations and obstruction checks: {remaining_rescuers}"
                 ),
             )
 
@@ -896,10 +915,78 @@ def verify_elimination_rounds(
     return available
 
 
+
+def verify_relation_table(
+    G,
+    profile_map,
+    certificate,
+):
+    """Verify a triangular two-profile relation table, if one is present."""
+    table = certificate.get(
+        "relation_table"
+    )
+
+    if table is None:
+        return False
+
+    name = certificate["name"]
+    profiles = table["profiles"]
+    rows = table["rows"]
+
+    n = len(profiles)
+
+    check(
+        len(rows) == n,
+        (
+            f"{name}: relation table has {len(rows)} rows, "
+            f"but {n} profiles are listed."
+        ),
+    )
+
+    for profile in profiles:
+        check(
+            profile in profile_map,
+            f"{name}: relation-table profile {profile} is not admissible.",
+        )
+
+    for i, row in enumerate(rows):
+        expected_length = n - i
+
+        check(
+            len(row) == expected_length,
+            (
+                f"{name}: relation-table row {i + 1} has length {len(row)}, "
+                f"expected {expected_length}."
+            ),
+        )
+
+        sigma = profiles[i]
+
+        for offset, expected_symbol in enumerate(row):
+            j = i + offset
+            tau = profiles[j]
+
+            computed_symbol = relation_symbol(
+                G,
+                profile_map[sigma],
+                profile_map[tau],
+            )
+
+            check(
+                computed_symbol == expected_symbol,
+                (
+                    f"{name}: relation-table mismatch for {sigma}, {tau}.\n"
+                    f"Expected: {expected_symbol}\n"
+                    f"Computed: {computed_symbol}"
+                ),
+            )
+
+    return True
+
+
+
 def verify_certificate(certificate):
-    """
-    Verify the finite data attached to one core certificate.
-    """
+    """Verify the finite data attached to one core certificate."""
     name = certificate["name"]
 
     G = build_core(certificate)
@@ -911,12 +998,8 @@ def verify_certificate(certificate):
 
     profile_map = admissible_profile_neighborhoods(
         G,
-        certificate[
-            "off_cycle_order"
-        ],
-        certificate[
-            "excluded_cycle_types"
-        ],
+        certificate["off_cycle_order"],
+        certificate["excluded_cycle_types"],
     )
 
     computed_profiles = list(
@@ -948,16 +1031,22 @@ def verify_certificate(certificate):
         certificate,
     )
 
+    relation_table_verified = verify_relation_table(
+        G,
+        profile_map,
+        certificate,
+    )
+
     return (
         len(profile_map),
         len(survivors),
+        relation_table_verified,
     )
 
 
+
 def run_internal_tests():
-    """
-    Run small sanity checks for the basic verification routines.
-    """
+    """Run small sanity checks for the basic verification routines."""
 
     assert cycle_neighborhood("U") == {
         "c1", "c2", "c3", "c4", "c5"
@@ -1004,9 +1093,7 @@ def run_internal_tests():
     }
 
     path = make_graph(
-        vertices=[
-            0, 1, 2
-        ],
+        vertices=[0, 1, 2],
         edges=[
             (0, 1),
             (1, 2),
@@ -1014,9 +1101,7 @@ def run_internal_tests():
     )
 
     triangle = make_graph(
-        vertices=[
-            0, 1, 2
-        ],
+        vertices=[0, 1, 2],
         edges=[
             (0, 1),
             (1, 2),
@@ -1050,9 +1135,7 @@ def run_internal_tests():
     )
 
     edge_and_isolated = make_graph(
-        vertices=[
-            0, 1, 2
-        ],
+        vertices=[0, 1, 2],
         edges=[
             (0, 1),
         ],
@@ -1064,9 +1147,7 @@ def run_internal_tests():
     )
 
     cycle5 = make_graph(
-        vertices=[
-            0, 1, 2, 3, 4
-        ],
+        vertices=[0, 1, 2, 3, 4],
         edges=[
             (0, 1),
             (1, 2),
@@ -1082,9 +1163,7 @@ def run_internal_tests():
     )
 
     single_edge = make_graph(
-        vertices=[
-            0, 1
-        ],
+        vertices=[0, 1],
         edges=[
             (0, 1),
         ],
@@ -1097,9 +1176,7 @@ def run_internal_tests():
     )
 
     two_isolated = make_graph(
-        vertices=[
-            0, 1
-        ],
+        vertices=[0, 1],
         edges=[],
     )
 
@@ -1122,10 +1199,11 @@ def run_internal_tests():
     )
 
 
+
+
 def main():
     print(
-        "Recolorability of "
-        "(2K_2, K_4)-Free Graphs"
+        "Yes, (2K_2, K_4)-free graphs are recolorable"
     )
 
     print(
@@ -1142,10 +1220,12 @@ def main():
 
     for certificate in CERTIFICATES:
 
-        number_of_profiles, number_of_survivors = (
-            verify_certificate(
-                certificate
-            )
+        (
+            number_of_profiles,
+            number_of_survivors,
+            relation_table_verified,
+        ) = verify_certificate(
+            certificate
         )
 
         if certificate.get(
@@ -1157,12 +1237,17 @@ def main():
                 - number_of_survivors
             )
 
-            print(
+            line = (
                 f"{certificate['name']}: "
                 f"{number_of_profiles} admissible profiles; "
                 f"{number_eliminated} eliminated; "
                 f"{number_of_survivors} survive."
             )
+
+            if relation_table_verified:
+                line += " Relation table verified."
+
+            print(line)
 
         else:
 
