@@ -2493,6 +2493,1055 @@ CERT_B13 = {
 }
 
 
+# ---------------------------------------------------------------------
+# Certificate B.14
+# ---------------------------------------------------------------------
+
+CERT_B14 = {
+    "name": "B.14",
+    "description": "Claim 12, Step 1",
+
+    "off_cycle_order": ["f", "g"],
+
+    "construction": [
+        ("f", "F", 1, []),
+        ("g", "F", 2, []),
+    ],
+
+    # Here U and Y1 are empty, f is the unique F1-vertex, and
+    # F3, F4, F5 are empty.  Step 1 is carried out under the
+    # assumption that none of R1[11], R2[11], Y3[10], Y4[11],
+    # Y5[01] occurs.
+    "excluded_cycle_types": [
+        ("U", None),
+        ("F", 1),
+        ("F", 3),
+        ("F", 4),
+        ("F", 5),
+        ("Y", 1),
+        ("Y", 3),
+        ("Y", 4),
+        ("Y", 5),
+    ],
+
+    "excluded_profiles": [
+        "R1[11]",
+        "R2[11]",
+    ],
+
+    "admissible_profiles": [
+        "Z[00]",
+        "Z[11]",
+        "F2[00]",
+        "Y2[00]",
+        "R1[01]",
+        "R2[10]",
+        "R3[01]",
+        "R3[11]",
+        "R4[00]",
+        "R4[11]",
+        "R5[10]",
+        "R5[11]",
+    ],
+
+    "elimination_rounds": [
+        [
+            {
+                "profile": "Z[00]",
+                "direction": "profile_le_core",
+                "core_vertex": "c1",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Z[11]",
+                "direction": "profile_le_core",
+                "core_vertex": "c4",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R4[00]",
+                "direction": "profile_le_core",
+                "core_vertex": "c4",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R3[11]",
+                "direction": "core_le_profile",
+                "core_vertex": "c3",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Y2[00]",
+                "direction": "profile_le_core",
+                "core_vertex": "f",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R4[11]",
+                "direction": "core_le_profile",
+                "core_vertex": "c4",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R2[10]",
+                "direction": "core_le_profile",
+                "core_vertex": "c2",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R1[01]",
+                "direction": "core_le_profile",
+                "core_vertex": "c1",
+                "expected_rescuers": [],
+            },
+        ],
+        [
+            {
+                "profile": "R5[11]",
+                "direction": "profile_le_core",
+                "core_vertex": "c5",
+                "expected_rescuers": ["R2[10]"],
+            },
+        ],
+        [
+            {
+                "profile": "F2[00]",
+                "direction": "core_le_profile",
+                "core_vertex": "g",
+                "expected_rescuers": ["R5[11]"],
+            },
+        ],
+    ],
+
+    "surviving_profiles": [
+        "R3[01]",
+        "R5[10]",
+    ],
+}
+
+
+# ---------------------------------------------------------------------
+# Certificate B.15
+# ---------------------------------------------------------------------
+
+CERT_B15 = {
+    "name": "B.15",
+    "description": "Claim 12, Step 2, starting from r in R1[11]",
+
+    "off_cycle_order": ["f", "g", "r"],
+
+    "construction": [
+        ("f", "F", 1, []),
+        ("g", "F", 2, []),
+        ("r", "R", 1, ["f", "g"]),
+    ],
+
+    "excluded_cycle_types": [
+        ("U", None),
+        ("F", 1),
+        ("F", 3),
+        ("F", 4),
+        ("F", 5),
+        ("Y", 1),
+    ],
+
+    "admissible_profiles": [
+        "Z[000]",
+        "Z[110]",
+        "F2[001]",
+        "Y2[000]",
+        "Y2[001]",
+        "Y3[100]",
+        "Y4[110]",
+        "Y5[010]",
+        "R1[010]",
+        "R1[110]",
+        "R2[101]",
+        "R2[111]",
+        "R3[010]",
+        "R3[011]",
+        "R3[110]",
+        "R4[000]",
+        "R4[001]",
+        "R4[110]",
+        "R5[101]",
+        "R5[111]",
+    ],
+
+    "elimination_rounds": [
+        [
+            {
+                "profile": "Z[000]",
+                "direction": "profile_le_core",
+                "core_vertex": "c1",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Y2[000]",
+                "direction": "profile_le_core",
+                "core_vertex": "f",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Z[110]",
+                "direction": "profile_le_core",
+                "core_vertex": "c5",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Y4[110]",
+                "direction": "core_le_profile",
+                "core_vertex": "c3",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R4[110]",
+                "direction": "core_le_profile",
+                "core_vertex": "c4",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R2[101]",
+                "direction": "core_le_profile",
+                "core_vertex": "c2",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R5[111]",
+                "direction": "profile_le_core",
+                "core_vertex": "c5",
+                "expected_rescuers": [],
+            },
+        ],
+        [
+            {
+                "profile": "R1[010]",
+                "direction": "core_le_profile",
+                "core_vertex": "c1",
+                "expected_rescuers": ["Y4[110]"],
+            },
+        ],
+    ],
+
+    "surviving_profiles": [
+        "R4[000]",
+        "Y3[100]",
+        "R3[010]",
+        "Y5[010]",
+        "R3[110]",
+        "R1[110]",
+        "R4[001]",
+        "Y2[001]",
+        "F2[001]",
+        "R5[101]",
+        "R3[011]",
+        "R2[111]",
+    ],
+
+    "core_comparisons": [
+        {
+            "left": "c1",
+            "right": "r",
+            "expected_rescuers": ["Y3[100]"],
+        },
+    ],
+}
+
+
+# ---------------------------------------------------------------------
+# Certificate B.16
+# ---------------------------------------------------------------------
+
+CERT_B16 = {
+    "name": "B.16",
+    "description": "Claim 12, Step 2, starting from y in Y3[10]",
+
+    "off_cycle_order": ["f", "g", "y"],
+
+    "construction": [
+        ("f", "F", 1, []),
+        ("g", "F", 2, []),
+        ("y", "Y", 3, ["f"]),
+    ],
+
+    "excluded_cycle_types": [
+        ("U", None),
+        ("F", 1),
+        ("F", 3),
+        ("F", 4),
+        ("F", 5),
+        ("Y", 1),
+    ],
+
+    "admissible_profiles": [
+        "Z[000]",
+        "Z[110]",
+        "Z[111]",
+        "F2[000]",
+        "Y2[001]",
+        "Y3[100]",
+        "Y4[111]",
+        "Y5[011]",
+        "R1[011]",
+        "R1[110]",
+        "R2[100]",
+        "R2[110]",
+        "R3[011]",
+        "R3[111]",
+        "R4[000]",
+        "R4[110]",
+        "R5[100]",
+        "R5[101]",
+        "R5[110]",
+        "R5[111]",
+    ],
+
+    "elimination_rounds": [
+        [
+            {
+                "profile": "Z[000]",
+                "direction": "profile_le_core",
+                "core_vertex": "c1",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Y2[001]",
+                "direction": "profile_le_core",
+                "core_vertex": "f",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R5[110]",
+                "direction": "profile_le_core",
+                "core_vertex": "c5",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Z[111]",
+                "direction": "profile_le_core",
+                "core_vertex": "c5",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R4[110]",
+                "direction": "core_le_profile",
+                "core_vertex": "c4",
+                "expected_rescuers": [],
+            },
+        ],
+    ],
+
+    "surviving_profiles": [
+        "R4[000]",
+        "F2[000]",
+        "R2[100]",
+        "R5[100]",
+        "Y3[100]",
+        "Z[110]",
+        "R2[110]",
+        "R1[110]",
+        "R5[101]",
+        "R3[011]",
+        "R1[011]",
+        "Y5[011]",
+        "R5[111]",
+        "R3[111]",
+        "Y4[111]",
+    ],
+
+    "core_comparisons": [
+        {
+            "left": "c2",
+            "right": "y",
+            "expected_rescuers": ["R1[110]"],
+        },
+    ],
+}
+
+
+# ---------------------------------------------------------------------
+# Certificate B.17
+# ---------------------------------------------------------------------
+
+CERT_B17 = {
+    "name": "B.17",
+    "description": "Claim 12, Step 2, after adjoining r and y",
+
+    "off_cycle_order": ["f", "g", "r", "y"],
+
+    "construction": [
+        ("f", "F", 1, []),
+        ("g", "F", 2, []),
+        ("r", "R", 1, ["f", "g"]),
+        ("y", "Y", 3, ["f"]),
+    ],
+
+    "excluded_cycle_types": [
+        ("U", None),
+        ("F", 1),
+        ("F", 3),
+        ("F", 4),
+        ("F", 5),
+        ("Y", 1),
+    ],
+
+    "admissible_profiles": [
+        "Z[0000]",
+        "Z[1100]",
+        "F2[0010]",
+        "Y2[0011]",
+        "Y3[1000]",
+        "Y4[1101]",
+        "Y5[0101]",
+        "R1[0101]",
+        "R1[1100]",
+        "R2[1010]",
+        "R2[1110]",
+        "R3[0101]",
+        "R3[0111]",
+        "R3[1101]",
+        "R4[0000]",
+        "R4[1100]",
+        "R5[1011]",
+        "R5[1111]",
+    ],
+
+    "direct_exclusions": [
+        {
+            "label": "C.28",
+            "profile": "R3[0111]",
+            "obstruction": "B10",
+            "witness": [
+                "c2", "c1", "g", "c4", "f",
+                "c5", "v", "c3", "r", "y",
+            ],
+        },
+    ],
+
+    "elimination_rounds": [
+        [
+            {
+                "profile": "Z[0000]",
+                "direction": "profile_le_core",
+                "core_vertex": "c1",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R4[0000]",
+                "direction": "profile_le_core",
+                "core_vertex": "f",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Y3[1000]",
+                "direction": "core_le_profile",
+                "core_vertex": "y",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Z[1100]",
+                "direction": "profile_le_core",
+                "core_vertex": "c5",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R1[1100]",
+                "direction": "core_le_profile",
+                "core_vertex": "r",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R4[1100]",
+                "direction": "core_le_profile",
+                "core_vertex": "c4",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R2[1010]",
+                "direction": "core_le_profile",
+                "core_vertex": "c2",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R2[1110]",
+                "direction": "core_le_profile",
+                "core_vertex": "c2",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R3[0101]",
+                "direction": "profile_le_core",
+                "core_vertex": "c3",
+                "expected_rescuers": [
+                    "R1[1100]",
+                    "R5[1011]",
+                ],
+            },
+            {
+                "profile": "Y5[0101]",
+                "direction": "core_le_profile",
+                "core_vertex": "c1",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Y4[1101]",
+                "direction": "core_le_profile",
+                "core_vertex": "c3",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Y2[0011]",
+                "direction": "profile_le_core",
+                "core_vertex": "f",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R5[1011]",
+                "direction": "profile_le_core",
+                "core_vertex": "c5",
+                "expected_rescuers": ["R3[0101]"],
+            },
+            {
+                "profile": "R5[1111]",
+                "direction": "profile_le_core",
+                "core_vertex": "c5",
+                "expected_rescuers": [],
+            },
+        ],
+        [
+            {
+                "profile": "F2[0010]",
+                "direction": "core_le_profile",
+                "core_vertex": "g",
+                "expected_rescuers": [
+                    "R2[1110]",
+                    "R5[1111]",
+                ],
+            },
+            {
+                "profile": "R1[0101]",
+                "direction": "core_le_profile",
+                "core_vertex": "c1",
+                "expected_rescuers": ["Y4[1101]"],
+            },
+            {
+                "profile": "R3[1101]",
+                "direction": "core_le_profile",
+                "core_vertex": "c3",
+                "expected_rescuers": ["Y5[0101]"],
+            },
+        ],
+    ],
+
+    "obstruction_relations": [
+        {
+            "label": "C.29",
+            "sigma": "R1[1100]",
+            "tau": "R3[0101]",
+            "relation": "edge",
+            "obstruction": "B10",
+            "witness": [
+                "c2", "c1", "g", "c4", "f",
+                "c5", "w", "c3", "v", "y",
+            ],
+        },
+        {
+            "label": "C.30",
+            "sigma": "R3[0101]",
+            "tau": "R5[1011]",
+            "relation": "edge",
+            "obstruction": "B11",
+            "witness": [
+                "c1", "c2", "f", "c4", "g",
+                "c3", "w", "c5", "v", "r", "y",
+            ],
+        },
+    ],
+
+    "surviving_profiles": [],
+}
+
+
+# ---------------------------------------------------------------------
+# Certificate B.18
+# ---------------------------------------------------------------------
+
+CERT_B18 = {
+    "name": "B.18",
+    "description": "Claim 12, Step 3, starting from b in Y5[01]",
+
+    "off_cycle_order": ["f", "g", "b"],
+
+    "construction": [
+        ("f", "F", 1, []),
+        ("g", "F", 2, []),
+        ("b", "Y", 5, ["g"]),
+    ],
+
+    "excluded_cycle_types": [
+        ("U", None),
+        ("F", 1),
+        ("F", 3),
+        ("F", 4),
+        ("F", 5),
+        ("Y", 1),
+    ],
+
+    "admissible_profiles": [
+        "Z[000]",
+        "Z[110]",
+        "Z[111]",
+        "F2[001]",
+        "Y2[000]",
+        "Y2[001]",
+        "Y3[101]",
+        "Y4[111]",
+        "Y5[010]",
+        "R1[010]",
+        "R1[110]",
+        "R2[101]",
+        "R2[110]",
+        "R3[010]",
+        "R3[011]",
+        "R3[110]",
+        "R3[111]",
+        "R4[000]",
+        "R4[110]",
+        "R5[101]",
+        "R5[111]",
+    ],
+
+    "elimination_rounds": [
+        [
+            {
+                "profile": "Z[000]",
+                "direction": "profile_le_core",
+                "core_vertex": "c1",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Z[111]",
+                "direction": "profile_le_core",
+                "core_vertex": "c5",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R4[110]",
+                "direction": "core_le_profile",
+                "core_vertex": "c4",
+                "expected_rescuers": [],
+            },
+        ],
+    ],
+
+    "surviving_profiles": [
+        "R4[000]",
+        "Y2[000]",
+        "R3[010]",
+        "R1[010]",
+        "Y5[010]",
+        "Z[110]",
+        "R2[110]",
+        "R3[110]",
+        "R1[110]",
+        "Y2[001]",
+        "F2[001]",
+        "R2[101]",
+        "R5[101]",
+        "Y3[101]",
+        "R3[011]",
+        "R5[111]",
+        "R3[111]",
+        "Y4[111]",
+    ],
+
+    "core_comparisons": [
+        {
+            "left": "c1",
+            "right": "b",
+            "expected_rescuers": ["R2[110]"],
+        },
+    ],
+}
+
+
+# ---------------------------------------------------------------------
+# Certificate B.19
+# ---------------------------------------------------------------------
+
+CERT_B19 = {
+    "name": "B.19",
+    "description": "Claim 12, Step 3, starting from q in R2[11]",
+
+    "off_cycle_order": ["f", "g", "q"],
+
+    "construction": [
+        ("f", "F", 1, []),
+        ("g", "F", 2, []),
+        ("q", "R", 2, ["f", "g"]),
+    ],
+
+    "excluded_cycle_types": [
+        ("U", None),
+        ("F", 1),
+        ("F", 3),
+        ("F", 4),
+        ("F", 5),
+        ("Y", 1),
+    ],
+
+    "admissible_profiles": [
+        "Z[000]",
+        "Z[110]",
+        "F2[000]",
+        "F2[001]",
+        "Y2[001]",
+        "Y3[100]",
+        "Y4[110]",
+        "Y5[010]",
+        "R1[011]",
+        "R1[111]",
+        "R2[100]",
+        "R2[110]",
+        "R3[011]",
+        "R3[111]",
+        "R4[000]",
+        "R4[001]",
+        "R4[110]",
+        "R5[100]",
+        "R5[101]",
+        "R5[110]",
+    ],
+
+    "elimination_rounds": [
+        [
+            {
+                "profile": "Z[000]",
+                "direction": "profile_le_core",
+                "core_vertex": "c1",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R3[111]",
+                "direction": "core_le_profile",
+                "core_vertex": "c3",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Z[110]",
+                "direction": "profile_le_core",
+                "core_vertex": "c5",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R4[110]",
+                "direction": "core_le_profile",
+                "core_vertex": "c4",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Y2[001]",
+                "direction": "profile_le_core",
+                "core_vertex": "f",
+                "expected_rescuers": ["Y5[010]"],
+            },
+            {
+                "profile": "R1[011]",
+                "direction": "core_le_profile",
+                "core_vertex": "c1",
+                "expected_rescuers": [],
+            },
+        ],
+        [
+            {
+                "profile": "Y4[110]",
+                "direction": "core_le_profile",
+                "core_vertex": "c5",
+                "expected_rescuers": ["Y2[001]"],
+            },
+        ],
+        [
+            {
+                "profile": "R2[100]",
+                "direction": "core_le_profile",
+                "core_vertex": "c2",
+                "expected_rescuers": ["Y4[110]"],
+            },
+        ],
+        [
+            {
+                "profile": "R5[110]",
+                "direction": "profile_le_core",
+                "core_vertex": "c5",
+                "expected_rescuers": ["R2[100]"],
+            },
+        ],
+    ],
+
+    "obstruction_relations": [
+        {
+            "label": "C.31",
+            "sigma": "Y5[010]",
+            "tau": "Y2[001]",
+            "relation": "edge",
+            "obstruction": "B10",
+            "witness": [
+                "c2", "c1", "c5", "c4", "c3",
+                "g", "w", "f", "v", "q",
+            ],
+        },
+    ],
+
+    "surviving_profiles": [
+        "R4[000]",
+        "F2[000]",
+        "R5[100]",
+        "Y3[100]",
+        "Y5[010]",
+        "R2[110]",
+        "R4[001]",
+        "F2[001]",
+        "R5[101]",
+        "R3[011]",
+        "R1[111]",
+    ],
+
+    "core_comparisons": [
+        {
+            "left": "c2",
+            "right": "q",
+            "expected_rescuers": ["Y5[010]"],
+        },
+    ],
+}
+
+
+# ---------------------------------------------------------------------
+# Certificate B.20
+# ---------------------------------------------------------------------
+
+CERT_B20 = {
+    "name": "B.20",
+    "description": "Claim 12, Step 3, after adjoining q and b",
+
+    "off_cycle_order": ["f", "g", "q", "b"],
+
+    "construction": [
+        ("f", "F", 1, []),
+        ("g", "F", 2, []),
+        ("q", "R", 2, ["f", "g"]),
+        ("b", "Y", 5, ["g"]),
+    ],
+
+    "excluded_cycle_types": [
+        ("U", None),
+        ("F", 1),
+        ("F", 3),
+        ("F", 4),
+        ("F", 5),
+        ("Y", 1),
+    ],
+
+    "admissible_profiles": [
+        "Z[0000]",
+        "Z[1100]",
+        "F2[0011]",
+        "Y2[0010]",
+        "Y2[0011]",
+        "Y3[1001]",
+        "Y4[1101]",
+        "Y5[0100]",
+        "R1[0110]",
+        "R1[1110]",
+        "R2[1001]",
+        "R2[1100]",
+        "R3[0111]",
+        "R3[1111]",
+        "R4[0000]",
+        "R4[1100]",
+        "R5[1001]",
+        "R5[1011]",
+        "R5[1101]",
+    ],
+
+    "direct_exclusions": [
+        {
+            "label": "C.32",
+            "profile": "Y2[0011]",
+            "obstruction": "B10",
+            "witness": [
+                "c2", "c1", "c5", "c4", "c3",
+                "g", "v", "f", "b", "q",
+            ],
+        },
+        {
+            "label": "C.33",
+            "profile": "R5[1011]",
+            "obstruction": "B10",
+            "witness": [
+                "c1", "c2", "f", "c4", "g",
+                "c3", "v", "c5", "q", "b",
+            ],
+        },
+    ],
+
+    "elimination_rounds": [
+        [
+            {
+                "profile": "Z[0000]",
+                "direction": "profile_le_core",
+                "core_vertex": "c1",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R5[1001]",
+                "direction": "profile_le_core",
+                "core_vertex": "c5",
+                "expected_rescuers": [
+                    "R2[1100]",
+                    "R3[0111]",
+                ],
+            },
+            {
+                "profile": "R4[0000]",
+                "direction": "profile_le_core",
+                "core_vertex": "g",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Y3[1001]",
+                "direction": "core_le_profile",
+                "core_vertex": "c2",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Y5[0100]",
+                "direction": "core_le_profile",
+                "core_vertex": "b",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Y4[1101]",
+                "direction": "core_le_profile",
+                "core_vertex": "c5",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Z[1100]",
+                "direction": "profile_le_core",
+                "core_vertex": "c3",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R3[0111]",
+                "direction": "profile_le_core",
+                "core_vertex": "c3",
+                "expected_rescuers": ["R5[1001]"],
+            },
+            {
+                "profile": "R2[1100]",
+                "direction": "core_le_profile",
+                "core_vertex": "q",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R3[1111]",
+                "direction": "core_le_profile",
+                "core_vertex": "c3",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R4[1100]",
+                "direction": "core_le_profile",
+                "core_vertex": "c4",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "Y2[0010]",
+                "direction": "profile_le_core",
+                "core_vertex": "f",
+                "expected_rescuers": ["Y5[0100]"],
+            },
+            {
+                "profile": "R1[0110]",
+                "direction": "core_le_profile",
+                "core_vertex": "c1",
+                "expected_rescuers": [],
+            },
+            {
+                "profile": "R1[1110]",
+                "direction": "core_le_profile",
+                "core_vertex": "c1",
+                "expected_rescuers": [],
+            },
+        ],
+        [
+            {
+                "profile": "R2[1001]",
+                "direction": "core_le_profile",
+                "core_vertex": "c2",
+                "expected_rescuers": ["Y4[1101]"],
+            },
+            {
+                "profile": "F2[0011]",
+                "direction": "profile_le_core",
+                "core_vertex": "g",
+                "expected_rescuers": ["R5[1001]"],
+            },
+        ],
+        [
+            {
+                "profile": "R5[1101]",
+                "direction": "core_le_profile",
+                "core_vertex": "c5",
+                "expected_rescuers": [
+                    "F2[0011]",
+                    "Y3[1001]",
+                ],
+            },
+        ],
+    ],
+
+    "obstruction_relations": [
+        {
+            "label": "C.34",
+            "sigma": "Y5[0100]",
+            "tau": "Y2[0010]",
+            "relation": "edge",
+            "obstruction": "B10",
+            "witness": [
+                "c2", "c1", "c5", "c4", "c3",
+                "g", "w", "f", "v", "q",
+            ],
+        },
+        {
+            "label": "C.35",
+            "sigma": "R2[1100]",
+            "tau": "R5[1001]",
+            "relation": "edge",
+            "obstruction": "B10",
+            "witness": [
+                "c1", "c2", "f", "c4", "g",
+                "c3", "w", "c5", "v", "b",
+            ],
+        },
+        {
+            "label": "C.36",
+            "sigma": "R5[1001]",
+            "tau": "R3[0111]",
+            "relation": "edge",
+            "obstruction": "B11",
+            "witness": [
+                "c2", "c1", "g", "c4", "f",
+                "c5", "w", "c3", "v", "q", "b",
+            ],
+        },
+    ],
+
+    "surviving_profiles": [],
+}
+
+
 CERTIFICATES = [
     K0,
     CERT_B1,
@@ -2508,6 +3557,13 @@ CERTIFICATES = [
     CERT_B11,
     CERT_B12,
     CERT_B13,
+    CERT_B14,
+    CERT_B15,
+    CERT_B16,
+    CERT_B17,
+    CERT_B18,
+    CERT_B19,
+    CERT_B20,
     B10,
     B11,
 ]
