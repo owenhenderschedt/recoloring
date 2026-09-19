@@ -5,3 +5,4 @@ Internal tests passed.
 K0: 23 admissible profiles verified.
 B.5: 22 admissible profiles; 5 eliminated; 17 survive.
 B10: 21 admissible profiles; 15 eliminated; 6 survive. Relation table verified.
+B11: 16 admissible profiles; 4 directly excluded; 12 eliminated; 0 survive.
