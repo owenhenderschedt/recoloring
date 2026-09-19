@@ -14,6 +14,19 @@ from itertools import combinations, product
 from certificates import CERTIFICATES, OBSTRUCTIONS
 
 
+class VerificationError(Exception):
+    """Raised when a finite certificate fails verification."""
+    pass
+
+
+def check(condition, message):
+    """
+    Raise an informative verification error when condition is false.
+    """
+    if not condition:
+        raise VerificationError(message)
+
+
 def make_graph(vertices, edges):
     """
     Return the adjacency dictionary of a finite simple graph.
@@ -509,26 +522,56 @@ def verify_local_comparison(
     profile_neighborhood,
     direction,
     core_vertex,
+    certificate_name,
+    profile,
+    round_number,
 ):
     """
     Verify the local comparison displayed in an elimination row.
     """
     S = set(profile_neighborhood)
 
-    assert core_vertex in G
-    assert core_vertex not in S
+    check(
+        core_vertex in G,
+        (
+            f"{certificate_name}, round {round_number}, {profile}: "
+            f"{core_vertex} is not a core vertex."
+        ),
+    )
+
+    check(
+        core_vertex not in S,
+        (
+            f"{certificate_name}, round {round_number}, {profile}: "
+            f"{core_vertex} belongs to the profile neighborhood, "
+            "so the stated comparison is not between nonadjacent vertices."
+        ),
+    )
 
     if direction == "profile_le_core":
 
-        assert S <= G[core_vertex]
+        check(
+            S <= G[core_vertex],
+            (
+                f"{certificate_name}, round {round_number}, {profile}: "
+                f"the claimed comparison {profile} <= {core_vertex} fails."
+            ),
+        )
 
     elif direction == "core_le_profile":
 
-        assert G[core_vertex] <= S
+        check(
+            G[core_vertex] <= S,
+            (
+                f"{certificate_name}, round {round_number}, {profile}: "
+                f"the claimed comparison {core_vertex} <= {profile} fails."
+            ),
+        )
 
     else:
-        raise ValueError(
-            f"Unknown comparison direction: {direction}"
+        raise VerificationError(
+            f"{certificate_name}: unknown comparison direction "
+            f"{direction}."
         )
 
 
@@ -568,11 +611,6 @@ def possible_rescuers(
 
         if direction == "profile_le_core":
 
-            # sigma <=_K core_vertex.
-            #
-            # A rescuer must be adjacent to sigma and
-            # nonadjacent to core_vertex.
-
             if (
                 core_vertex not in T
                 and edge_permitted(G, S, T)
@@ -580,11 +618,6 @@ def possible_rescuers(
                 rescuers.append(tau)
 
         elif direction == "core_le_profile":
-
-            # core_vertex <=_K sigma.
-            #
-            # A rescuer must be adjacent to core_vertex and
-            # nonadjacent to sigma.
 
             if (
                 core_vertex in T
@@ -645,6 +678,8 @@ def verify_obstruction_relations(
     Verify every explicit obstruction relation recorded
     for the certificate.
     """
+    name = certificate["name"]
+
     for data in certificate.get(
         "obstruction_relations",
         [],
@@ -654,31 +689,42 @@ def verify_obstruction_relations(
         tau = data["tau"]
         relation = data["relation"]
 
-        assert sigma in profile_map
-        assert tau in profile_map
+        check(
+            sigma in profile_map,
+            f"{name}: obstruction profile {sigma} is not admissible.",
+        )
+
+        check(
+            tau in profile_map,
+            f"{name}: obstruction profile {tau} is not admissible.",
+        )
 
         S = profile_map[sigma]
         T = profile_map[tau]
 
         if relation == "edge":
 
-            assert edge_permitted(
-                G,
-                S,
-                T,
+            check(
+                edge_permitted(G, S, T),
+                (
+                    f"{name}: the stated edge between "
+                    f"{sigma} and {tau} is not permitted."
+                ),
             )
 
         elif relation == "nonedge":
 
-            assert nonedge_permitted(
-                G,
-                S,
-                T,
+            check(
+                nonedge_permitted(G, S, T),
+                (
+                    f"{name}: the stated nonedge between "
+                    f"{sigma} and {tau} is not permitted."
+                ),
             )
 
         else:
-            raise ValueError(
-                f"Unknown relation: {relation}"
+            raise VerificationError(
+                f"{name}: unknown relation {relation}."
             )
 
         extension = build_two_profile_extension(
@@ -692,6 +738,14 @@ def verify_obstruction_relations(
             "obstruction"
         ]
 
+        check(
+            obstruction_name in OBSTRUCTIONS,
+            (
+                f"{name}: unknown obstruction "
+                f"{obstruction_name}."
+            ),
+        )
+
         obstruction_definition = (
             OBSTRUCTIONS[
                 obstruction_name
@@ -702,13 +756,19 @@ def verify_obstruction_relations(
             obstruction_definition
         )
 
-        assert same_ordered_graph(
-            extension,
-            data["witness"],
-            obstruction_graph,
-            obstruction_definition[
-                "ordered_vertices"
-            ],
+        check(
+            same_ordered_graph(
+                extension,
+                data["witness"],
+                obstruction_graph,
+                obstruction_definition[
+                    "ordered_vertices"
+                ],
+            ),
+            (
+                f"{name}: the stated {obstruction_name} witness for "
+                f"{sigma}, {tau} with relation {relation} is incorrect."
+            ),
         )
 
 
@@ -720,16 +780,9 @@ def verify_elimination_rounds(
     """
     Verify the elimination rounds of a finite certificate.
 
-    For each elimination row the program checks:
-
-      (1) the displayed local comparison;
-      (2) the complete list of possible rescuer profiles;
-      (3) that every possible rescuer is unavailable, either because
-          it was eliminated in an earlier round or because the required
-          relation creates a recorded obstruction.
-
     Profiles in one round are removed simultaneously.
     """
+    name = certificate["name"]
     available = list(profile_map)
 
     rounds = certificate.get(
@@ -737,10 +790,11 @@ def verify_elimination_rounds(
         [],
     )
 
-    for round_data in rounds:
+    for round_number, round_data in enumerate(
+        rounds,
+        start=1,
+    ):
 
-        # Every row in this round is checked against the profiles
-        # available at the beginning of the round.
         profiles_to_remove = []
 
         for row in round_data:
@@ -749,13 +803,22 @@ def verify_elimination_rounds(
             direction = row["direction"]
             core_vertex = row["core_vertex"]
 
-            assert sigma in available
+            check(
+                sigma in available,
+                (
+                    f"{name}, round {round_number}, {sigma}: "
+                    "profile is not available at the start of the round."
+                ),
+            )
 
             verify_local_comparison(
                 G,
                 profile_map[sigma],
                 direction,
                 core_vertex,
+                name,
+                sigma,
+                round_number,
             )
 
             raw_rescuers = possible_rescuers(
@@ -771,9 +834,15 @@ def verify_elimination_rounds(
                 "expected_rescuers"
             ]
 
-            # This checks that the rescuer list stated in the
-            # certificate is exhaustive.
-            assert raw_rescuers == expected_rescuers
+            check(
+                raw_rescuers == expected_rescuers,
+                (
+                    f"{name}, round {round_number}, {sigma}: "
+                    "rescuer list mismatch.\n"
+                    f"Expected: {expected_rescuers}\n"
+                    f"Computed: {raw_rescuers}"
+                ),
+            )
 
             relation = rescue_relation(
                 direction
@@ -790,14 +859,19 @@ def verify_elimination_rounds(
                 )
             ]
 
-            # Every possible rescuer must now be unavailable.
-            assert remaining_rescuers == []
+            check(
+                remaining_rescuers == [],
+                (
+                    f"{name}, round {round_number}, {sigma}: "
+                    "the following rescuers remain legal after "
+                    f"obstruction checks: {remaining_rescuers}"
+                ),
+            )
 
             profiles_to_remove.append(
                 sigma
             )
 
-        # Profiles in one round disappear simultaneously.
         available = [
             sigma
             for sigma in available
@@ -809,8 +883,14 @@ def verify_elimination_rounds(
     )
 
     if expected_survivors is not None:
-        assert set(available) == set(
-            expected_survivors
+
+        check(
+            set(available) == set(expected_survivors),
+            (
+                f"{name}: final survivor list mismatch.\n"
+                f"Expected: {expected_survivors}\n"
+                f"Computed: {available}"
+            ),
         )
 
     return available
@@ -820,27 +900,41 @@ def verify_certificate(certificate):
     """
     Verify the finite data attached to one core certificate.
     """
+    name = certificate["name"]
+
     G = build_core(certificate)
 
-    assert is_2k2_k4_free(G)
+    check(
+        is_2k2_k4_free(G),
+        f"{name}: the stated core is not (2K_2, K_4)-free.",
+    )
 
-    profile_map = (
-        admissible_profile_neighborhoods(
-            G,
-            certificate[
-                "off_cycle_order"
-            ],
-            certificate[
-                "excluded_cycle_types"
-            ],
-        )
+    profile_map = admissible_profile_neighborhoods(
+        G,
+        certificate[
+            "off_cycle_order"
+        ],
+        certificate[
+            "excluded_cycle_types"
+        ],
+    )
+
+    computed_profiles = list(
+        profile_map
     )
 
     expected_profiles = certificate[
         "admissible_profiles"
     ]
 
-    assert list(profile_map) == expected_profiles
+    check(
+        computed_profiles == expected_profiles,
+        (
+            f"{name}: admissible-profile list mismatch.\n"
+            f"Expected: {expected_profiles}\n"
+            f"Computed: {computed_profiles}"
+        ),
+    )
 
     verify_obstruction_relations(
         G,
