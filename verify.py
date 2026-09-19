@@ -405,10 +405,29 @@ def profile_label(kind, i, bits):
 
 
 
+def satisfies_required_bits(kind, bits, required_bits):
+    """Return True exactly when a profile satisfies the branch bit restrictions."""
+    for rule in required_bits:
+        if kind not in rule["kinds"]:
+            continue
+
+        position = rule["position"]
+        value = rule["value"]
+
+        assert 0 <= position < len(bits)
+        assert value in {"0", "1"}
+
+        if bits[position] != value:
+            return False
+
+    return True
+
+
 def admissible_profile_neighborhoods(
     G,
     off_cycle_order,
     excluded_cycle_types=(),
+    required_bits=(),
 ):
     """Return the admissible profiles and their core neighborhoods."""
     excluded_cycle_types = set(
@@ -427,6 +446,13 @@ def admissible_profile_neighborhoods(
             repeat=len(off_cycle_order),
         ):
             bits = "".join(bit_tuple)
+
+            if not satisfies_required_bits(
+                kind,
+                bits,
+                required_bits,
+            ):
+                continue
 
             S = profile_neighborhood(
                 kind,
@@ -1107,6 +1133,7 @@ def verify_certificate(certificate):
         G,
         certificate["off_cycle_order"],
         certificate["excluded_cycle_types"],
+        certificate.get("required_bits", []),
     )
 
     computed_profiles = list(
