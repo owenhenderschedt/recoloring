@@ -11,7 +11,11 @@ Python 3; no external packages are required.
 
 from itertools import combinations, product
 
-from certificates import CERTIFICATES, OBSTRUCTIONS
+from certificates import (
+    AUXILIARY_OBSTRUCTION_CHECKS,
+    CERTIFICATES,
+    OBSTRUCTIONS,
+)
 
 
 class VerificationError(Exception):
@@ -905,6 +909,121 @@ def verify_obstruction_relations(
 
 
 
+def verify_auxiliary_obstruction_check(data):
+    """Verify one Appendix C obstruction that is not attached to a B-certificate."""
+    name = data["name"]
+
+    G = build_core(data)
+
+    check(
+        is_2k2_k4_free(G),
+        f"{name}: the stated auxiliary core is not (2K_2, K_4)-free.",
+    )
+
+    profile_map = admissible_profile_neighborhoods(
+        G,
+        data["off_cycle_order"],
+        data.get("excluded_cycle_types", []),
+        data.get("required_bits", []),
+        data.get("excluded_profiles", []),
+    )
+
+    sigma = data["sigma"]
+    tau = data["tau"]
+    relation = data["relation"]
+
+    check(
+        sigma in profile_map,
+        f"{name}: obstruction profile {sigma} is not admissible.",
+    )
+    check(
+        tau in profile_map,
+        f"{name}: obstruction profile {tau} is not admissible.",
+    )
+
+    S = profile_map[sigma]
+    T = profile_map[tau]
+
+    if relation == "edge":
+        check(
+            edge_permitted(G, S, T),
+            f"{name}: the stated edge between {sigma} and {tau} is not permitted.",
+        )
+    elif relation == "nonedge":
+        check(
+            nonedge_permitted(G, S, T),
+            f"{name}: the stated nonedge between {sigma} and {tau} is not permitted.",
+        )
+    else:
+        raise VerificationError(
+            f"{name}: unknown relation {relation}."
+        )
+
+    extension = build_two_profile_extension(
+        G,
+        S,
+        T,
+        relation,
+    )
+
+    obstruction_name = data["obstruction"]
+    check(
+        obstruction_name in OBSTRUCTIONS,
+        f"{name}: unknown obstruction {obstruction_name}.",
+    )
+
+    obstruction_definition = OBSTRUCTIONS[obstruction_name]
+    obstruction_graph = build_core(obstruction_definition)
+
+    check(
+        same_ordered_graph(
+            extension,
+            data["witness"],
+            obstruction_graph,
+            obstruction_definition["ordered_vertices"],
+        ),
+        (
+            f"{name}: the stated {obstruction_name} witness for "
+            f"{sigma}, {tau} with relation {relation} is incorrect."
+        ),
+    )
+
+
+def verify_appendix_c_labels():
+    """Check that Appendix C labels C.1--C.36 occur exactly once."""
+    labels = []
+
+    for certificate in CERTIFICATES:
+        for key in ("direct_exclusions", "obstruction_relations"):
+            for data in certificate.get(key, []):
+                label = data.get("label")
+                if label is not None and label.startswith("C."):
+                    labels.append(label)
+
+    labels.extend(
+        data["name"]
+        for data in AUXILIARY_OBSTRUCTION_CHECKS
+        if data["name"].startswith("C.")
+    )
+
+    expected = [f"C.{i}" for i in range(1, 37)]
+
+    check(
+        len(labels) == len(set(labels)),
+        "Appendix C: an obstruction label occurs more than once.",
+    )
+
+    check(
+        set(labels) == set(expected),
+        (
+            "Appendix C: obstruction-label set mismatch.\n"
+            f"Expected: {expected}\n"
+            f"Computed: {sorted(labels, key=lambda s: int(s.split('.')[1]))}"
+        ),
+    )
+
+
+
 def verify_elimination_rounds(
     G,
     profile_map,
@@ -1437,6 +1556,15 @@ def main():
 
     print(
         "Internal tests passed."
+    )
+
+    for data in AUXILIARY_OBSTRUCTION_CHECKS:
+        verify_auxiliary_obstruction_check(data)
+
+    verify_appendix_c_labels()
+
+    print(
+        "Appendix C: obstruction witnesses C.1--C.36 verified."
     )
 
     for certificate in CERTIFICATES:
